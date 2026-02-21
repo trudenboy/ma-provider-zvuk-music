@@ -3,9 +3,6 @@ on:
   workflow_dispatch:
 jobs:
   test:
-    uses: trudenboy/ma-provider-tools/.github/workflows/reusable-test.yml@main
+    uses: trudenboy/ma-provider-tools/.github/workflows/reusable-hello.yml@test/minimal-reusable
     with:
-      provider_type: music_provider
-      provider_domain: zvuk_music
-      provider_path: provider/
-      manifest_path: provider/manifest.json
+      name: zvuk
