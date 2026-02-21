@@ -1,13 +1,17 @@
 # Zvuk Music Provider for Music Assistant
 
-Music provider for [Music Assistant](https://music-assistant.io) that adds Zvuk Music
-as a music source with browse, search, and playback support.
+English | [Русский](README.ru.md)
+
+> Stream music from Zvuk Music with browse, search, and playback support.
 
 ## Features
 
-- Browse: Liked Tracks, Artists, Albums, Playlists
-- Search: tracks, artists, albums, playlists
-- Playback: MP3/FLAC
+| Feature | Details |
+|---------|---------|
+| Browse | Liked Tracks, Artists, Albums, Playlists |
+| Search | Tracks, artists, albums, playlists |
+| Playback | MP3 (320 kbps), FLAC (lossless) |
+| Library sync | Liked Tracks → MA library |
 
 ## Compatibility
 
@@ -17,17 +21,22 @@ as a music source with browse, search, and playback support.
 
 ## Installation
 
-This provider is installed automatically as part of Music Assistant.
+Installed automatically as part of Music Assistant.
 
 ### Configuration
 
 1. Settings → Music Sources → Add Source → Zvuk Music
-2. Enter your Zvuk Music token
-3. Save
+2. Enter your Zvuk Music X-Auth-Token
+3. Select streaming quality
+4. Save
 
-## Development
+## Documentation
 
-See [DEVELOPMENT.md](DEVELOPMENT.md) for development setup.
+| Guide | Description |
+|-------|-------------|
+| [Configuration](docs/configuration.md) | All settings and options |
+| [Development](docs/development.md) | Dev setup, tests, linting |
+| [Contributing](docs/contributing.md) | Bug reports, feature requests, PRs |
 
 ## License
 
