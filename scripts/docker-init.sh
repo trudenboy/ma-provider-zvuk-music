@@ -10,8 +10,8 @@ PROVIDERS_DIR=$(/app/venv/bin/python3 -c \
     "import music_assistant.providers, os; print(os.path.dirname(music_assistant.providers.__file__))")
 
 # Remove any existing yandex_music provider (image may bundle one), then symlink ours
-rm -rf "${PROVIDERS_DIR}/yandex_music"
-ln -s /tmp/provider "${PROVIDERS_DIR}/yandex_music"
+rm -rf "${PROVIDERS_DIR}/zvuk_music"
+ln -s /tmp/provider "${PROVIDERS_DIR}/zvuk_music"
 echo "==> Provider linked: ${PROVIDERS_DIR}/zvuk_music"
 
 # Install provider-specific runtime dependencies (skips music_assistant itself)
