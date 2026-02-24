@@ -20,4 +20,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - feat: initial provider setup (`d40be07`)
 
+
+<!-- Pre-separation: development in trudenboy/ma-server monorepo -->
+<!-- The following changes were developed in the `trudenboy/ma-server` monorepo before this provider was extracted into its own repository on 2026-02-19. -->
+
+## 2026-02-10
+
+- feat: provider accepted into upstream Music Assistant (music-assistant/server#3090)
+
+## 2026-02-03
+
+- chore: update Zvuk Music icons to official 2024 logo
+- test: add Zvuk Music unit tests
+
+## 2026-02-01
+
+- feat: add Zvuk Music provider scaffold (manifest, constants, icons)
+- feat: add Zvuk Music API client and model parsers
+- feat: implement ZvukMusicProvider (browse, search, streaming)
+
 <!-- changelog entries will be added here by release workflow -->
