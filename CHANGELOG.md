@@ -39,4 +39,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - feat: add Zvuk Music API client and model parsers
 - feat: implement ZvukMusicProvider (browse, search, streaming)
 
+## [1.6.0] - 2026-02-25
+
+## What's Changed
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/1
+* Main by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/2
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/3
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/4
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/5
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/6
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/7
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/8
+* docs: unify documentation structure by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/9
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/10
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/11
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/14
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/19
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/20
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/22
+* fix: FURB110 — replace ternary with `or` in `parsers.py` by @Copilot in https://github.com/trudenboy/ma-provider-zvuk-music/pull/24
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/25
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/26
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/27
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/28
+* docs: add testing, incident-management, dev-docker links to README by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/29
+* fix: remove extra trailing newlines from docs files by @Copilot in https://github.com/trudenboy/ma-provider-zvuk-music/pull/30
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/31
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/32
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/33
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/35
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/36
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/37
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/38
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/39
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/40
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/41
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/42
+* chore: set Russian README as default by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/43
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/44
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/45
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/46
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/47
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/48
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/49
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/50
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/51
+* feat: Zvuk API improvements — metadata, similar tracks, streaming optimization, bug fix by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/53
+* Feature/zvuk api improvements by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/54
+* feat: BROWSE and RECOMMENDATIONS — synthesis and editorial playlists by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/55
+* feat: LYRICS — synchronized lyrics via /api/tiny/lyrics by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/56
+* fix: resolve static playlist cover images via auth cookie by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/57
+* fix: update get_editorial_playlist_ids() for changed API response shape by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/58
+* fix: use browser headers in resolve_image() for static Zvuk URLs by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/59
+* fix: always try FLAC first when lossless quality is requested by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/60
+
+## New Contributors
+* @trudenboy made their first contribution in https://github.com/trudenboy/ma-provider-zvuk-music/pull/1
+* @Copilot made their first contribution in https://github.com/trudenboy/ma-provider-zvuk-music/pull/24
+
+**Full Changelog**: https://github.com/trudenboy/ma-provider-zvuk-music/compare/v1.5.0...v1.6.0
+
+---
+
 <!-- changelog entries will be added here by release workflow -->
