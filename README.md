@@ -2,6 +2,8 @@
 
 [English](README.en.md) | Русский
 
+📖 <a href="https://trudenboy.github.io/ma-provider-zvuk-music/">Документация пользователя</a>
+
 > Слушайте свою библиотеку [Звук Музыки](https://zvuk.com/) через [Music Assistant](https://music-assistant.io/) с поддержкой поиска, управления плейлистами и воспроизведения без потерь.
 
 ## Быстрый старт (Docker)
