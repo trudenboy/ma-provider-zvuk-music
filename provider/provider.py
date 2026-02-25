@@ -648,7 +648,7 @@ class ZvukMusicProvider(MusicProvider):
             quality_str,
             has_flac,
         )
-        if quality_str == QUALITY_LOSSLESS and has_flac:
+        if quality_str == QUALITY_LOSSLESS:
             quality_chain = [
                 ("flac", ContentType.FLAC, 0),
                 ("high", ContentType.MP3, 320),
