@@ -296,6 +296,42 @@ class ZvukMusicProvider(MusicProvider):
                     self.logger.debug("Error parsing artist track: %s", err)
         return result
 
+    @use_cache(3600 * 24 * 7)
+    async def get_similar_tracks(self, prov_track_id: str, limit: int = 25) -> list[Track]:
+        """Get similar tracks based on related releases of the track's album.
+
+        Uses the Zvuk ``release.related`` field to find similar releases and samples tracks from
+        them. Only called if provider supports ProviderFeature.SIMILAR_TRACKS.
+
+        :param prov_track_id: The provider track ID.
+        :param limit: Maximum number of similar tracks to return.
+        :return: List of Track objects.
+        """
+        track = await self.client.get_track(prov_track_id)
+        if not track or not track.release:
+            return []
+
+        release = await self.client.get_release(str(track.release.id))
+        if not release or not getattr(release, "related", None):
+            return []
+
+        result: list[Track] = []
+        for related_release in release.related:
+            if len(result) >= limit:
+                break
+            related_full = await self.client.get_release(str(related_release.id))
+            if not related_full or not related_full.tracks:
+                continue
+            for t in related_full.tracks[:2]:
+                try:
+                    result.append(parse_track(self, t))
+                except InvalidDataError as err:
+                    self.logger.debug("Error parsing similar track: %s", err)
+                if len(result) >= limit:
+                    break
+
+        return result[:limit]
+
     # Library methods
 
     async def get_library_artists(self) -> AsyncGenerator[Artist, None]:
@@ -332,12 +368,19 @@ class ZvukMusicProvider(MusicProvider):
 
     async def get_library_tracks(self) -> AsyncGenerator[Track, None]:
         """Retrieve library tracks from Zvuk Music."""
-        tracks = await self.client.get_liked_tracks()
-        for track in tracks:
-            try:
-                yield parse_track(self, track)
-            except InvalidDataError as err:
-                self.logger.debug("Error parsing library track: %s", err)
+        collection = await self.client.get_collection()
+        if not collection or not collection.tracks:
+            return
+
+        track_ids = [str(item.id) for item in collection.tracks if item.id]
+        for i in range(0, len(track_ids), DEFAULT_LIMIT):
+            batch_ids = track_ids[i : i + DEFAULT_LIMIT]
+            tracks = await self.client.get_tracks(batch_ids)
+            for track in tracks:
+                try:
+                    yield parse_track(self, track)
+                except InvalidDataError as err:
+                    self.logger.debug("Error parsing library track: %s", err)
 
     async def get_library_playlists(self) -> AsyncGenerator[Playlist, None]:
         """Retrieve library playlists from Zvuk Music."""
@@ -447,8 +490,9 @@ class ZvukMusicProvider(MusicProvider):
         """Get stream details for a track.
 
         Uses /api/tiny/track/stream to get a direct (non-DRM) URL. When lossless is
-        requested and the track has FLAC available, requests "flac" quality and returns
-        ContentType.FLAC. Falls back through "high" (320kbps MP3) → "mid" (128kbps MP3).
+        requested and the track has FLAC available (``has_flac=True``), requests "flac" quality
+        and returns ContentType.FLAC. Falls back through "high" (320kbps MP3) → "mid"
+        (128kbps MP3). When ``has_flac=False``, FLAC is skipped entirely.
 
         :param item_id: The track ID.
         :param media_type: The media type (should be TRACK).
@@ -467,14 +511,15 @@ class ZvukMusicProvider(MusicProvider):
 
         # Build quality fallback chain.
         # /api/tiny/track/stream quality strings: "flac", "high", "mid"
-        # Note: has_flac from GraphQL is unreliable (field not in query);
-        # always try FLAC for lossless and fall back if endpoint returns no URL.
+        # Use has_flac field from the fetched track to skip unnecessary FLAC attempts.
+        has_flac = getattr(track, "has_flac", True) if track is not None else True
         self.logger.debug(
-            "Stream request for track %s: quality_pref=%s",
+            "Stream request for track %s: quality_pref=%s has_flac=%s",
             item_id,
             quality_str,
+            has_flac,
         )
-        if quality_str == QUALITY_LOSSLESS:
+        if quality_str == QUALITY_LOSSLESS and has_flac:
             quality_chain = [
                 ("flac", ContentType.FLAC, 0),
                 ("high", ContentType.MP3, 320),

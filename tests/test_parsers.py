@@ -32,18 +32,34 @@ def _create_mock_artist(
     artist_id: int = 123,
     title: str | None = "Test Artist",
     image: Mock | None = None,
+    description: str | None = None,
+    second_image: Mock | None = None,
 ) -> Mock:
     """Create a mock Zvuk artist object.
 
     :param artist_id: Artist ID.
     :param title: Artist name.
     :param image: Optional mock image object.
+    :param description: Optional artist biography (only on full Artist).
+    :param second_image: Optional fanart/background image (only on full Artist).
     :return: Mock artist object.
     """
     artist = Mock()
     artist.id = artist_id
     artist.title = title
     artist.image = image
+
+    # description and second_image are only on full Artist, not SimpleArtist
+    if description is not None:
+        artist.description = description
+    else:
+        del artist.description
+
+    if second_image is not None:
+        artist.second_image = second_image
+    else:
+        del artist.second_image
+
     return artist
 
 
@@ -55,6 +71,7 @@ def _create_mock_release(
     date: str | None = None,
     explicit: bool = False,
     genres: list[Mock] | None = None,
+    label: Mock | None = None,
     image: Mock | None = None,
 ) -> Mock:
     """Create a mock Zvuk release object.
@@ -66,6 +83,7 @@ def _create_mock_release(
     :param date: Release date in ISO format.
     :param explicit: Whether the release is explicit.
     :param genres: List of mock genre objects.
+    :param label: Optional mock label object (only on full Release).
     :param image: Optional mock image object.
     :return: Mock release object.
     """
@@ -98,6 +116,12 @@ def _create_mock_release(
         # SimpleRelease doesn't have genres
         del release.genres
 
+    # Label (only on full Release)
+    if label is not None:
+        release.label = label
+    else:
+        del release.label
+
     return release
 
 
@@ -109,6 +133,8 @@ def _create_mock_track(
     duration: int = 180,
     position: int | None = None,
     explicit: bool = False,
+    genres: list[Mock] | None = None,
+    credits_str: str | None = None,
 ) -> Mock:
     """Create a mock Zvuk track object.
 
@@ -119,6 +145,8 @@ def _create_mock_track(
     :param duration: Track duration in seconds.
     :param position: Track position in album.
     :param explicit: Whether the track is explicit.
+    :param genres: List of mock genre objects (only on full Track).
+    :param credits_str: Credits string (only on full Track).
     :return: Mock track object.
     """
     track = Mock()
@@ -134,6 +162,18 @@ def _create_mock_track(
         track.position = position
     else:
         del track.position
+
+    # Genres are only on full Track, not SimpleTrack
+    if genres is not None:
+        track.genres = genres
+    else:
+        del track.genres
+
+    # Credits are only on full Track, not SimpleTrack
+    if credits_str is not None:
+        track.credits = credits_str
+    else:
+        del track.credits
 
     return track
 
@@ -234,6 +274,57 @@ class TestParseArtist:
         result = parse_artist(mock_provider, artist_obj)
 
         assert result.name == "Unknown Artist"
+
+    def test_parse_artist_with_description(self, mock_provider: Mock) -> None:
+        """Test parsing a full artist with biography/description."""
+        artist_obj = _create_mock_artist(
+            artist_id=123, title="Artist Bio", description="A great musician."
+        )
+
+        result = parse_artist(mock_provider, artist_obj)
+
+        assert result.metadata.description == "A great musician."
+
+    def test_parse_artist_without_description(self, mock_provider: Mock) -> None:
+        """Test parsing a SimpleArtist without description (attribute absent)."""
+        artist_obj = _create_mock_artist(artist_id=123, title="Simple Artist")
+
+        result = parse_artist(mock_provider, artist_obj)
+
+        assert result.metadata.description is None
+
+    def test_parse_artist_with_fanart(self, mock_provider: Mock) -> None:
+        """Test parsing an artist with second_image mapped as FANART."""
+        second_image = _create_mock_image("https://zvuk.com/fanart/{width}x{height}.jpg")
+        artist_obj = _create_mock_artist(
+            artist_id=123, title="Artist With Fanart", second_image=second_image
+        )
+
+        result = parse_artist(mock_provider, artist_obj)
+
+        assert result.metadata.images is not None
+        fanart_images = [i for i in result.metadata.images if i.type == ImageType.FANART]
+        assert len(fanart_images) == 1
+        assert fanart_images[0].path == "https://zvuk.com/fanart/600x600.jpg"
+
+    def test_parse_artist_with_thumb_and_fanart(self, mock_provider: Mock) -> None:
+        """Test parsing an artist with both thumb and fanart images."""
+        image = _create_mock_image("https://zvuk.com/img/{width}x{height}.jpg")
+        second_image = _create_mock_image("https://zvuk.com/fanart/{width}x{height}.jpg")
+        artist_obj = _create_mock_artist(
+            artist_id=123,
+            title="Artist Both Images",
+            image=image,
+            second_image=second_image,
+        )
+
+        result = parse_artist(mock_provider, artist_obj)
+
+        assert result.metadata.images is not None
+        assert len(result.metadata.images) == 2
+        types = {i.type for i in result.metadata.images}
+        assert ImageType.THUMB in types
+        assert ImageType.FANART in types
 
 
 class TestParseAlbum:
@@ -351,6 +442,24 @@ class TestParseAlbum:
         assert result.name == "Album Name"
         assert result.version == "Deluxe Edition"
 
+    def test_parse_album_with_label(self, mock_provider: Mock) -> None:
+        """Test parsing a full Release with record label."""
+        label = Mock()
+        label.title = "XL Recordings"
+        release_obj = _create_mock_release(release_id=456, title="Labeled Album", label=label)
+
+        result = parse_album(mock_provider, release_obj)
+
+        assert result.metadata.label == "XL Recordings"
+
+    def test_parse_album_without_label(self, mock_provider: Mock) -> None:
+        """Test parsing a SimpleRelease without label attribute."""
+        release_obj = _create_mock_release(release_id=456, title="No Label Album")
+
+        result = parse_album(mock_provider, release_obj)
+
+        assert result.metadata.label is None
+
 
 class TestParseTrack:
     """Tests for parse_track function."""
@@ -450,6 +559,44 @@ class TestParseTrack:
         result = parse_track(mock_provider, track_obj)
 
         assert result.name == "Unknown Track"
+
+    def test_parse_track_with_genres(self, mock_provider: Mock) -> None:
+        """Test parsing a full Track with genres."""
+        g1 = Mock()
+        g1.name = "Rock"
+        g2 = Mock()
+        g2.name = "Alternative"
+        track_obj = _create_mock_track(track_id=789, title="Genres Track", genres=[g1, g2])
+
+        result = parse_track(mock_provider, track_obj)
+
+        assert result.metadata.genres == {"Rock", "Alternative"}
+
+    def test_parse_track_without_genres(self, mock_provider: Mock) -> None:
+        """Test parsing a SimpleTrack without genres attribute."""
+        track_obj = _create_mock_track(track_id=789, title="No Genres Track")
+
+        result = parse_track(mock_provider, track_obj)
+
+        assert result.metadata.genres is None
+
+    def test_parse_track_with_credits(self, mock_provider: Mock) -> None:
+        """Test parsing a full Track with credits."""
+        track_obj = _create_mock_track(
+            track_id=789, title="Credited Track", credits_str="John Lennon; Paul McCartney"
+        )
+
+        result = parse_track(mock_provider, track_obj)
+
+        assert result.metadata.performers == {"John Lennon; Paul McCartney"}
+
+    def test_parse_track_without_credits(self, mock_provider: Mock) -> None:
+        """Test parsing a SimpleTrack without credits attribute."""
+        track_obj = _create_mock_track(track_id=789, title="No Credits Track")
+
+        result = parse_track(mock_provider, track_obj)
+
+        assert result.metadata.performers is None
 
 
 class TestParsePlaylist:
