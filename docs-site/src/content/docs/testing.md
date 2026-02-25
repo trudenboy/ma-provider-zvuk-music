@@ -1,18 +1,18 @@
 ---
 title: Тестирование
-description: Руководство по запуску тестов и линтеров провайдера Zvuk Music
 ---
+
 
 ## Быстрый старт
 
 ```bash
-uv run pytest tests/ -v
+uv run pytest provider/tests/ -v
 ```
 
 С отчётом о покрытии:
 
 ```bash
-uv run pytest tests/ -v --cov=provider/ --cov-report=term-missing
+uv run pytest provider/tests/ -v --cov=provider/ --cov-report=term-missing
 ```
 
 ## CI-пайплайн
@@ -23,6 +23,7 @@ uv run pytest tests/ -v --cov=provider/ --cov-report=term-missing
 |---------|-----------|
 | `test-*` | Запускает pytest с проверкой покрытия, загружает отчёт в Codecov |
 | `lint-*` | Запускает ruff, mypy, codespell, pre-commit |
+
 
 Тесты запускаются на основе `music-assistant/server@dev` (без форка — лёгкий CI).
 
@@ -67,11 +68,11 @@ uv run ruff format --check provider/
 Локально просмотреть покрытие:
 
 ```bash
-uv run pytest tests/ --cov=provider/ --cov-report=html
+uv run pytest provider/tests/ --cov=provider/ --cov-report=html
 open htmlcov/index.html
 ```
 
 ## Если CI упал
 
 Если тесты или линтеры упали в CI, автоматически создаётся GitHub-задача с меткой `incident:ci`.
-Подробнее: [Управление инцидентами](/ma-provider-zvuk-music/incident-management/).
+Подробнее о процессе работы с инцидентами: [Управление инцидентами](incident-management.md).

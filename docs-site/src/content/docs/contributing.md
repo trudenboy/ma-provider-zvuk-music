@@ -1,53 +1,52 @@
----
-title: Участие в разработке
-description: Как внести вклад в разработку провайдера Zvuk Music для Music Assistant
----
+[← Development](development.md) · [Back to README](../README.md)
 
-Спасибо за интерес к **Zvuk Music**!
+# Contributing
 
-## Кодекс поведения
+Thank you for your interest in contributing to **Zvuk Music**!
 
-Будьте уважительны, инклюзивны и профессиональны. Придерживаемся стандартного кодекса поведения открытого ПО.
+## Code of Conduct
 
-## Сообщение об ошибках
+Be respectful, inclusive, and professional. We follow the standard open source code of conduct.
 
-Откройте GitHub Issue с:
-- Подробным описанием проблемы
-- Шагами для воспроизведения
-- Ожидаемым и фактическим поведением
-- Деталями окружения (версия MA, версия провайдера)
-- Логами MA-сервера
+## Reporting Bugs
 
-## Предложение функций
+Open a GitHub Issue with:
+- Detailed description of the problem
+- Steps to reproduce
+- Expected vs actual behavior
+- Environment details (MA version, provider version)
+- Logs from the MA server
 
-Откройте GitHub Issue с:
-- Описанием сценария использования и проблемы
-- Предлагаемым решением
-- Рассмотренными альтернативами
-- Готовностью реализовать самостоятельно
+## Suggesting Features
+
+Open a GitHub Issue explaining:
+- The use case and problem it solves
+- Your proposed solution
+- Alternative approaches you considered
+- Whether you are willing to implement it
 
 ## Pull Requests
 
-1. Форкните и клонируйте репозиторий
-2. Создайте feature-ветку: `git checkout -b feature/your-feature-name`
-3. Внесите изменения в соответствии со [стандартами кода](/ma-provider-zvuk-music/development/#качество-кода)
-4. Напишите или обновите тесты (см. [Разработка → Запуск тестов](/ma-provider-zvuk-music/development/#запуск-тестов))
-5. Убедитесь, что CI проходит: `pre-commit run --all-files`
-6. Обновите документацию, если изменения влияют на поведение или конфигурацию
-7. Запушьте в ваш форк и откройте PR в ветку `dev`
+1. Fork and clone the repository
+2. Create a feature branch: `git checkout -b feature/your-feature-name`
+3. Make your changes following the [coding standards](development.md#code-quality)
+4. Write or update tests (see [Development → Running Tests](development.md#running-tests))
+5. Ensure CI passes: `pre-commit run --all-files`
+6. Update documentation if your change affects behavior or configuration
+7. Push to your fork and open a PR against `dev`
 
-Описание PR должно включать:
-- Что изменилось и почему
-- Как протестировать (ручные шаги или названия тестов)
-- Возможные нюансы и последующие задачи
+PR description should include:
+- What changed and why
+- How to test it (manual steps or test names)
+- Any gotchas or follow-up work
 
-## Лицензия
+## License
 
-Внося вклад, вы соглашаетесь, что ваши изменения будут лицензированы по Apache 2.0 License.
+By contributing, you agree that your contributions will be licensed under the Apache 2.0 License.
 
-## Дополнительные материалы
+## Further Reading
 
-- [Тестирование](/ma-provider-zvuk-music/testing/) — запуск тестов локально, CI, покрытие
-- [Управление инцидентами](/ma-provider-zvuk-music/incident-management/) — метки, автоматизация, триаж Copilot
-- [Docker для разработки](/ma-provider-zvuk-music/dev-docker/) — запуск MA + провайдера локально
-- [Окружение разработки](/ma-provider-zvuk-music/development/) — настройка, инструменты, стандарты кода
+- [Testing Guide](testing.md) — running tests locally, CI pipeline, coverage
+- [Incident Management](incident-management.md) — labels, issue automation, Copilot triage
+- [Docker Dev Environment](dev-docker.md) — run MA + provider locally without dependencies
+- [Development](development.md) — dev setup, tooling, code quality standards
