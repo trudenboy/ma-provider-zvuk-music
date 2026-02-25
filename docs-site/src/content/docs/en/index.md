@@ -12,7 +12,6 @@ Built on top of the [zvuk-music](https://github.com/sashkent3/zvuk-music) librar
 
 :::caution[Disclaimer]
 This is an **unofficial** implementation with no affiliation to [Zvuk](https://zvuk.com) or its owners.
-The provider uses an unofficial API client and is not supported or endorsed by the Zvuk service.
 :::
 
 :::note[Subscription]
