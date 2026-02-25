@@ -18,9 +18,29 @@ source "$REPO_ROOT/$env_name/bin/activate"
 
 
 # Install upstream MA server + provider in editable mode
-uv pip install \
-  "git+https://github.com/music-assistant/server.git@dev" \
-  -e "$REPO_ROOT/.[test]"
+MA_SERVER_DIR="${MA_SERVER_DIR:-$HOME/Projects/ma-server}"
+
+if [[ -d "$MA_SERVER_DIR" ]]; then
+  echo "Installing ma-server from local clone: $MA_SERVER_DIR"
+  # Sync provider source into ma-server before installing
+  rsync -a --delete \
+    --include="*.py" --include="manifest.json" \
+    --exclude="__pycache__/" --exclude="*.pyc" \
+    "$REPO_ROOT/provider/" "$MA_SERVER_DIR/music_assistant/providers/zvuk_music/"
+  # 1) Install ma-server from local clone (includes test extras + requirements)
+  uv pip install -e "$MA_SERVER_DIR/.[test]" -r "$MA_SERVER_DIR/requirements_all.txt"
+  # 2) Install our provider's test extras only (no-deps avoids reinstalling ma-server from git)
+  uv pip install -e "$REPO_ROOT/.[test]" --no-deps
+  # 3) Remove any stale music_assistant namespace packages from site-packages
+  #    (editable install uses finder; leftover site-packages shadow the editable path)
+  SITE_PKG=$(python -c "import sysconfig; print(sysconfig.get_path('platlib'))")
+  rm -rf "$SITE_PKG/music_assistant"
+else
+  echo "Local ma-server not found, installing from git (may be stale)"
+  uv pip install \
+    "git+https://github.com/music-assistant/server.git@dev" \
+    -e "$REPO_ROOT/.[test]"
+fi
 
 
 # Set up pre-commit hooks if available
