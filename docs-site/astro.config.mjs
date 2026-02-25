@@ -27,6 +27,7 @@ export default defineConfig({
 					label: 'Возможности',
 					translations: { en: 'Features' },
 					items: [
+						{ label: 'Browse (Обзор)', translations: { en: 'Browse' }, slug: 'features/browse' },
 						{ label: 'Рекомендации', translations: { en: 'Recommendations' }, slug: 'features/recommendations' },
 						{ label: 'Тексты песен', translations: { en: 'Lyrics' }, slug: 'features/lyrics' },
 						{ label: 'Похожие треки', translations: { en: 'Similar Tracks' }, slug: 'features/similar-tracks' },
