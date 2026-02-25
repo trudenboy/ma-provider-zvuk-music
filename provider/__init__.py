@@ -41,6 +41,8 @@ SUPPORTED_FEATURES = {
     ProviderFeature.SIMILAR_TRACKS,
     ProviderFeature.BROWSE,
     ProviderFeature.RECOMMENDATIONS,
+    ProviderFeature.LYRICS,
+    ProviderFeature.TRACK_METADATA,
 }
 
 

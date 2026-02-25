@@ -387,6 +387,27 @@ class ZvukMusicClient:
                 return [int(pid) for pid in item.get("ids", [])]
         return []
 
+    @handle_zvuk_errors(not_found_return=None)
+    async def get_lyrics(self, track_id: str) -> dict[str, str | None] | None:
+        """Get lyrics for a track from Zvuk lyrics API.
+
+        Fetches lyrics from ``/api/tiny/lyrics?track_id={id}``.
+        Returns synced LRC text (type ``'subtitle'``) or plain text (type ``'lyrics'``).
+        Returns ``None`` if the track has no lyrics.
+
+        :param track_id: Track ID.
+        :return: Dict with ``lyrics`` (str or None), ``type`` (str or None),
+            ``translation`` (str or None), or None on error.
+        """
+        client = self._ensure_connected()
+        result = await client._request.get(
+            f"{TINY_API_URL}/lyrics",
+            params={"track_id": track_id},
+        )
+        if not result or not result.get("lyrics"):
+            return None
+        return result
+
     # Library modifications
 
     async def like_track(self, track_id: str) -> bool:
