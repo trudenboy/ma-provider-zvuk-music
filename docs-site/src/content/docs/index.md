@@ -2,9 +2,6 @@
 title: Провайдер Zvuk Music
 description: Документация провайдера Zvuk Music для Music Assistant
 ---
-<img src="https://raw.githubusercontent.com/trudenboy/ma-provider-zvuk-music/dev/provider/icon.svg" alt="Zvuk Music" style="width: 72px; float: right; margin: 0 0 1rem 1.5rem;" />
-
-
 <img src="/ma-provider-zvuk-music/zvuk-icon.svg" alt="Zvuk Music" style="width: 64px; float: right; margin: 0 0 1rem 1.5rem;" />
 
 Music Assistant поддерживает [Zvuk Music](https://zvuk.com) — российский стриминговый сервис.
