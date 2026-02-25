@@ -2,8 +2,6 @@
 title: Contributing
 ---
 
-[← Development](development.md) · [Back to README](../README.md)
-
 # Contributing
 
 Thank you for your interest in contributing to **Zvuk Music**!
