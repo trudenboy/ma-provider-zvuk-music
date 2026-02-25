@@ -16,6 +16,7 @@ from music_assistant_models.media_items import (
     Artist,
     AudioFormat,
     ItemMapping,
+    MediaItemMetadata,
     MediaItemType,
     Playlist,
     RecommendationFolder,
@@ -465,6 +466,34 @@ class ZvukMusicProvider(MusicProvider):
                 )
 
         return folders
+
+    async def get_track_metadata(self, track: Track) -> MediaItemMetadata | None:
+        """Fetch lyrics for a track from Zvuk's lyrics API.
+
+        Called by MA when ``ProviderFeature.TRACK_METADATA`` is declared.
+        Returns LRC-synced lyrics (``lrc_lyrics``) when the API returns type
+        ``'subtitle'``, otherwise plain text (``lyrics``). Returns ``None`` if
+        the track has no lyrics or the API call fails.
+
+        :param track: The MA Track object. ``item_id`` is used to call the API.
+        :return: MediaItemMetadata with lyrics, or None.
+        """
+        track_id = track.item_id
+        result = await self.client.get_lyrics(track_id)
+        if not result:
+            return None
+
+        lyrics_text: str = result.get("lyrics") or ""
+        lyrics_type: str = result.get("type") or ""
+        if not lyrics_text:
+            return None
+
+        metadata = MediaItemMetadata()
+        if lyrics_type == "subtitle":
+            metadata.lrc_lyrics = lyrics_text
+        else:
+            metadata.lyrics = lyrics_text
+        return metadata
 
     # Library edit methods
 
