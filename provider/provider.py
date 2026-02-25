@@ -507,7 +507,19 @@ class ZvukMusicProvider(MusicProvider):
         """
         token = self.config.get_value(CONF_TOKEN)
         try:
-            async with self.mass.http_session.get(path, cookies={"auth": str(token)}) as resp:
+            async with self.mass.http_session.get(
+                path,
+                headers={
+                    "X-Auth-Token": str(token),
+                    "User-Agent": (
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                        "AppleWebKit/537.36 (KHTML, like Gecko) "
+                        "Chrome/120.0.0.0 Safari/537.36"
+                    ),
+                    "Referer": "https://zvuk.com/",
+                    "Origin": "https://zvuk.com",
+                },
+            ) as resp:
                 if resp.status == 200:
                     return await resp.read()
         except Exception as err:
