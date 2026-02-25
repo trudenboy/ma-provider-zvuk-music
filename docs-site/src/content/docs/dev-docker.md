@@ -1,7 +1,8 @@
 ---
-title: Docker для разработки
-description: Локальная разработка через Docker — запусти Music Assistant одной командой
+title: Docker
 ---
+
+# Zvuk Music — локальная разработка через Docker
 
 Запусти полноценный Music Assistant с провайдером Zvuk Music одной командой —
 без установки Python, FFmpeg и прочих зависимостей.
@@ -35,10 +36,8 @@ docker compose -f docker-compose.dev.yml up
 3. Нажми **Add** и введи свои учётные данные
 4. Конфигурация провайдера сохраняется в `.ma-data/` и переживает перезапуски
 
-:::tip
-Если провайдер не появляется — проверь логи (`docker compose -f docker-compose.dev.yml logs`).
-Ошибка при старте будет видна там.
-:::
+> 💡 Если провайдер не появляется — проверь логи (`docker compose -f docker-compose.dev.yml logs`).
+> Ошибка при старте будет видна там.
 
 ## Управление контейнером
 
