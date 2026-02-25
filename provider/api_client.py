@@ -381,11 +381,9 @@ class ZvukMusicClient:
         )
         if not result:
             return []
-        meta = result.get("meta", [])
-        for item in meta:
-            if item.get("type") == "playlist":
-                return [int(pid) for pid in item.get("ids", [])]
-        return []
+        # Response: {'page': {'data': [{'type': 'playlist', 'id': 123}, ...]}, ...}
+        data = result.get("page", {}).get("data", [])
+        return [int(item["id"]) for item in data if item.get("type") == "playlist"]
 
     @handle_zvuk_errors(not_found_return=None)
     async def get_lyrics(self, track_id: str) -> dict[str, str | None] | None:
