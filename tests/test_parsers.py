@@ -13,6 +13,7 @@ from music_assistant.providers.zvuk_music.parsers import (
     parse_playlist,
     parse_track,
 )
+from provider.constants import SYNTHESIS_PLAYLIST_IDS
 
 
 def _create_mock_image(template: str = "https://zvuk.com/image/{width}x{height}") -> Mock:
@@ -701,3 +702,57 @@ class TestParsePlaylist:
 
         assert result.name == "Playlist No Cover"
         assert result.metadata.images is None or len(result.metadata.images) == 0
+
+    def test_parse_playlist_simple_playlist_no_user_id(self, mock_provider: Mock) -> None:
+        """Test that SimplePlaylist (no user_id) is parsed as not editable.
+
+        Synthesis playlists (IDs 3,4,6,11,12,13,14,15) are returned as SimplePlaylist
+        objects by get_short_playlist() — they have no user_id attribute.
+        """
+        playlist_obj = _create_mock_playlist(
+            playlist_id=3,  # synthesis playlist ID
+            title="Свежие релизы",
+            description="Только в вашем вкусе",
+            user_id=None,  # SimplePlaylist: no user_id
+        )
+
+        result = parse_playlist(mock_provider, playlist_obj)
+
+        assert result.name == "Свежие релизы"
+        assert result.metadata.description == "Только в вашем вкусе"
+        assert result.is_editable is False
+
+    def test_parse_playlist_simple_playlist_with_image(self, mock_provider: Mock) -> None:
+        """Test that SimplePlaylist with image URL is parsed correctly."""
+        image = Mock()
+        image.src = "https://obs-image-service.example.com/abc123"
+        image.get_url = Mock(return_value="https://zvuk.com/synthesis/600x600.jpg")
+
+        playlist_obj = _create_mock_playlist(
+            playlist_id=6,
+            title="Когда хочется музыки",
+            description="У тишины нет шансов",  # noqa: RUF001
+            user_id=None,
+            image=image,
+        )
+
+        result = parse_playlist(mock_provider, playlist_obj)
+
+        assert result.name == "Когда хочется музыки"
+        assert result.is_editable is False
+        # Image should be mapped
+        assert result.metadata.images is not None
+        assert len(result.metadata.images) == 1
+
+    def test_parse_playlist_synthesis_ids_treated_as_not_editable(
+        self, mock_provider: Mock
+    ) -> None:
+        """Verify all synthesis playlist IDs (3,4,6,11,12,13,14,15) parse as not editable."""
+        for pid in SYNTHESIS_PLAYLIST_IDS:
+            playlist_obj = _create_mock_playlist(
+                playlist_id=pid,
+                title=f"Playlist {pid}",
+                user_id=None,  # SimplePlaylist has no user_id
+            )
+            result = parse_playlist(mock_provider, playlist_obj)
+            assert result.is_editable is False, f"Playlist {pid} should not be editable"

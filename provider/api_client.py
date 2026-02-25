@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 from typing import Any, ParamSpec, TypeVar, cast
 
 from music_assistant_models.errors import (
@@ -17,6 +17,7 @@ from zvuk_music import CollectionItem as ZvukCollectionItem
 from zvuk_music import Playlist as ZvukPlaylist
 from zvuk_music import Release as ZvukRelease
 from zvuk_music import Search as ZvukSearch
+from zvuk_music import SimplePlaylist as ZvukSimplePlaylist
 from zvuk_music import SimpleTrack as ZvukSimpleTrack
 from zvuk_music import Stream as ZvukStream
 from zvuk_music import Track as ZvukTrack
@@ -349,6 +350,42 @@ class ZvukMusicClient:
         """
         client = self._ensure_connected()
         return await client.get_user_playlists()
+
+    @handle_zvuk_errors(not_found_return=[])
+    async def get_short_playlists(
+        self, playlist_ids: Sequence[int | str]
+    ) -> list[ZvukSimplePlaylist]:
+        """Get playlist metadata (title, image, description) by IDs without tracks.
+
+        Uses the lightweight getShortPlaylist GraphQL query which returns only metadata.
+        Works for both regular playlists and synthesis playlists (IDs 3,4,6,11,12,13,14,15).
+
+        :param playlist_ids: List of playlist IDs.
+        :return: List of SimplePlaylist objects.
+        """
+        client = self._ensure_connected()
+        return await client.get_short_playlist(list(playlist_ids))
+
+    @handle_zvuk_errors(not_found_return=[])
+    async def get_editorial_playlist_ids(self) -> list[int]:
+        """Get editorial (curated) playlist IDs from Zvuk's grid content API.
+
+        Fetches «Подборки» — genre-focused curated playlists shown on the home page.
+
+        :return: List of playlist IDs.
+        """
+        client = self._ensure_connected()
+        result = await client._request.get(
+            f"{TINY_API_URL}/grid/content",
+            params={"name": "editorial_playlist", "ranker_enabled": "true"},
+        )
+        if not result:
+            return []
+        meta = result.get("meta", [])
+        for item in meta:
+            if item.get("type") == "playlist":
+                return [int(pid) for pid in item.get("ids", [])]
+        return []
 
     # Library modifications
 

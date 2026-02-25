@@ -18,6 +18,7 @@ from music_assistant_models.media_items import (
     ItemMapping,
     MediaItemType,
     Playlist,
+    RecommendationFolder,
     SearchResults,
     Track,
 )
@@ -33,6 +34,7 @@ from .constants import (
     DEFAULT_LIMIT,
     PLAYLIST_TRACKS_PAGE_SIZE,
     QUALITY_LOSSLESS,
+    SYNTHESIS_PLAYLIST_IDS,
 )
 from .parsers import parse_album, parse_artist, parse_playlist, parse_track
 
@@ -383,7 +385,11 @@ class ZvukMusicProvider(MusicProvider):
                     self.logger.debug("Error parsing library track: %s", err)
 
     async def get_library_playlists(self) -> AsyncGenerator[Playlist, None]:
-        """Retrieve library playlists from Zvuk Music."""
+        """Retrieve library playlists from Zvuk Music.
+
+        Yields user's own playlists followed by Zvuk's personalized synthesis
+        playlists («Плейлисты для вас»: IDs 3, 4, 6, 11, 12, 13, 14, 15).
+        """
         collection_items = await self.client.get_user_playlists()
         if not collection_items:
             return
@@ -397,6 +403,68 @@ class ZvukMusicProvider(MusicProvider):
                     yield parse_playlist(self, playlist)
                 except InvalidDataError as err:
                     self.logger.debug("Error parsing library playlist: %s", err)
+
+        # Synthesis playlists — personalized AI playlists («Плейлисты для вас»)
+        synthesis_playlists = await self.client.get_short_playlists(SYNTHESIS_PLAYLIST_IDS)
+        for simple_pl in synthesis_playlists:
+            try:
+                yield parse_playlist(self, simple_pl)
+            except InvalidDataError as err:
+                self.logger.debug("Error parsing synthesis playlist: %s", err)
+
+    async def recommendations(self) -> list[RecommendationFolder]:
+        """Return personalized and editorial playlist recommendations.
+
+        Returns two folders:
+        - «Плейлисты для вас»: Zvuk's AI-generated personalized playlists.
+        - «Подборки»: Editorial genre-themed curated playlists.
+        """
+        folders: list[RecommendationFolder] = []
+
+        # Folder 1: Personalized synthesis playlists («Плейлисты для вас»)
+        synthesis_playlists = await self.client.get_short_playlists(SYNTHESIS_PLAYLIST_IDS)
+        for_you_items: list[Playlist] = []
+        for simple_pl in synthesis_playlists:
+            try:
+                for_you_items.append(parse_playlist(self, simple_pl))
+            except InvalidDataError as err:
+                self.logger.debug("Error parsing synthesis playlist: %s", err)
+        if for_you_items:
+            folders.append(
+                RecommendationFolder(
+                    item_id="for_you",
+                    provider=self.instance_id,
+                    name="Плейлисты для вас",
+                    subtitle="Персональные плейлисты от Звук",
+                    icon="mdi-playlist-music",
+                    items=for_you_items,  # type: ignore[arg-type]
+                )
+            )
+
+        # Folder 2: Editorial curated playlists («Подборки»)
+        editorial_ids = await self.client.get_editorial_playlist_ids()
+        if editorial_ids:
+            editorial_str_ids = [str(pid) for pid in editorial_ids[:DEFAULT_LIMIT]]
+            editorial_playlists = await self.client.get_playlists(editorial_str_ids)
+            editorial_items: list[Playlist] = []
+            for full_pl in editorial_playlists:
+                try:
+                    editorial_items.append(parse_playlist(self, full_pl))
+                except InvalidDataError as err:
+                    self.logger.debug("Error parsing editorial playlist: %s", err)
+            if editorial_items:
+                folders.append(
+                    RecommendationFolder(
+                        item_id="editorial",
+                        provider=self.instance_id,
+                        name="Подборки",
+                        subtitle="Плейлисты от редакции Звук по жанрам",
+                        icon="mdi-music-box-multiple",
+                        items=editorial_items,  # type: ignore[arg-type]
+                    )
+                )
+
+        return folders
 
     # Library edit methods
 
@@ -502,12 +570,15 @@ class ZvukMusicProvider(MusicProvider):
         quality_pref = self.config.get_value(CONF_QUALITY)
         quality_str = str(quality_pref) if quality_pref is not None else QUALITY_LOSSLESS
 
-        # Fetch track metadata for duration.
+        # Fetch track metadata for duration and FLAC availability.
         track = await self.client.get_track(item_id)
         duration: int | None = None
+        has_flac: bool = True  # default: always attempt FLAC; field is unreliable
         if track is not None:
             if getattr(track, "duration", None) is not None:
                 duration = int(track.duration)
+            if getattr(track, "has_flac", None) is not None:
+                has_flac = bool(track.has_flac)
 
         # Build quality fallback chain.
         # /api/tiny/track/stream quality strings: "flac", "high", "mid"
