@@ -38,6 +38,7 @@ SUPPORTED_FEATURES = {
     ProviderFeature.LIBRARY_PLAYLISTS_EDIT,
     ProviderFeature.PLAYLIST_TRACKS_EDIT,
     ProviderFeature.PLAYLIST_CREATE,
+    ProviderFeature.SIMILAR_TRACKS,
 }
 
 

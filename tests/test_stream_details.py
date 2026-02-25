@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from music_assistant_models.enums import ContentType
+from music_assistant_models.errors import MediaNotFoundError
 
 from music_assistant.providers.zvuk_music.api_client import ZvukMusicClient
 from music_assistant.providers.zvuk_music.provider import ZvukMusicProvider
@@ -24,11 +25,10 @@ def _make_mock_track(has_flac: bool = True, duration: int = 240) -> MagicMock:
     return track
 
 
-def _make_provider(quality_pref: str, token: str = "test_token") -> ZvukMusicProvider:
+def _make_provider(quality_pref: str) -> ZvukMusicProvider:
     """Create a ZvukMusicProvider with mocked MA and config.
 
     :param quality_pref: Quality preference string ("lossless" or "high").
-    :param token: Auth token.
     :return: Configured provider instance.
     """
     provider = MagicMock(spec=ZvukMusicProvider)
@@ -39,6 +39,7 @@ def _make_provider(quality_pref: str, token: str = "test_token") -> ZvukMusicPro
 
     provider.instance_id = "zvuk_music--test"
     provider.client = MagicMock(spec=ZvukMusicClient)
+    provider.logger = MagicMock()
 
     return provider
 
@@ -115,8 +116,6 @@ class TestGetStreamDetailsFlac:
     @pytest.mark.asyncio
     async def test_lossless_with_has_flac_requests_flac(self) -> None:
         """When lossless is requested and track has FLAC, ContentType.FLAC is returned."""
-        from music_assistant.providers.zvuk_music.provider import ZvukMusicProvider
-
         provider = MagicMock(spec=ZvukMusicProvider)
         provider.config = MagicMock()
         provider.config.get_value = MagicMock(return_value="lossless")
@@ -128,6 +127,7 @@ class TestGetStreamDetailsFlac:
             return_value="https://cdn.zvuk.com/track.flac"
         )
         provider.client = mock_client
+        provider.logger = MagicMock()
 
         result = await ZvukMusicProvider.get_stream_details(provider, "12345")
 
@@ -138,8 +138,6 @@ class TestGetStreamDetailsFlac:
     @pytest.mark.asyncio
     async def test_lossless_without_has_flac_uses_high(self) -> None:
         """When lossless is requested but track has no FLAC, HIGH MP3 is used."""
-        from music_assistant.providers.zvuk_music.provider import ZvukMusicProvider
-
         provider = MagicMock(spec=ZvukMusicProvider)
         provider.config = MagicMock()
         provider.config.get_value = MagicMock(return_value="lossless")
@@ -147,10 +145,9 @@ class TestGetStreamDetailsFlac:
 
         mock_client = MagicMock(spec=ZvukMusicClient)
         mock_client.get_track = AsyncMock(return_value=_make_mock_track(has_flac=False))
-        mock_client.get_direct_stream_url = AsyncMock(
-            return_value="https://cdn.zvuk.com/track.mp3"
-        )
+        mock_client.get_direct_stream_url = AsyncMock(return_value="https://cdn.zvuk.com/track.mp3")
         provider.client = mock_client
+        provider.logger = MagicMock()
 
         result = await ZvukMusicProvider.get_stream_details(provider, "12345")
 
@@ -164,8 +161,6 @@ class TestGetStreamDetailsFlac:
     @pytest.mark.asyncio
     async def test_flac_url_failure_falls_back_to_high(self) -> None:
         """When FLAC URL request returns None, falls back to HIGH MP3."""
-        from music_assistant.providers.zvuk_music.provider import ZvukMusicProvider
-
         provider = MagicMock(spec=ZvukMusicProvider)
         provider.config = MagicMock()
         provider.config.get_value = MagicMock(return_value="lossless")
@@ -174,13 +169,14 @@ class TestGetStreamDetailsFlac:
         mock_client = MagicMock(spec=ZvukMusicClient)
         mock_client.get_track = AsyncMock(return_value=_make_mock_track(has_flac=True))
 
-        def stream_url_side_effect(track_id: str, quality: str) -> str | None:
+        def stream_url_side_effect(_track_id: str, quality: str) -> str | None:
             if quality == "flac":
                 return None  # FLAC unavailable for this track
             return "https://cdn.zvuk.com/track.mp3"
 
         mock_client.get_direct_stream_url = AsyncMock(side_effect=stream_url_side_effect)
         provider.client = mock_client
+        provider.logger = MagicMock()
 
         result = await ZvukMusicProvider.get_stream_details(provider, "12345")
 
@@ -190,8 +186,6 @@ class TestGetStreamDetailsFlac:
     @pytest.mark.asyncio
     async def test_high_quality_pref_skips_flac(self) -> None:
         """When high (not lossless) is preferred, FLAC is never requested."""
-        from music_assistant.providers.zvuk_music.provider import ZvukMusicProvider
-
         provider = MagicMock(spec=ZvukMusicProvider)
         provider.config = MagicMock()
         provider.config.get_value = MagicMock(return_value="high")
@@ -199,10 +193,9 @@ class TestGetStreamDetailsFlac:
 
         mock_client = MagicMock(spec=ZvukMusicClient)
         mock_client.get_track = AsyncMock(return_value=_make_mock_track(has_flac=True))
-        mock_client.get_direct_stream_url = AsyncMock(
-            return_value="https://cdn.zvuk.com/track.mp3"
-        )
+        mock_client.get_direct_stream_url = AsyncMock(return_value="https://cdn.zvuk.com/track.mp3")
         provider.client = mock_client
+        provider.logger = MagicMock()
 
         result = await ZvukMusicProvider.get_stream_details(provider, "12345")
 
@@ -213,8 +206,6 @@ class TestGetStreamDetailsFlac:
     @pytest.mark.asyncio
     async def test_stream_path_is_url(self) -> None:
         """StreamDetails.path contains the URL returned by get_direct_stream_url."""
-        from music_assistant.providers.zvuk_music.provider import ZvukMusicProvider
-
         provider = MagicMock(spec=ZvukMusicProvider)
         provider.config = MagicMock()
         provider.config.get_value = MagicMock(return_value="lossless")
@@ -225,6 +216,7 @@ class TestGetStreamDetailsFlac:
         mock_client.get_track = AsyncMock(return_value=_make_mock_track(has_flac=True))
         mock_client.get_direct_stream_url = AsyncMock(return_value=expected_url)
         provider.client = mock_client
+        provider.logger = MagicMock()
 
         result = await ZvukMusicProvider.get_stream_details(provider, "12345")
 
@@ -233,8 +225,6 @@ class TestGetStreamDetailsFlac:
     @pytest.mark.asyncio
     async def test_duration_from_track_metadata(self) -> None:
         """StreamDetails.duration is populated from track.duration."""
-        from music_assistant.providers.zvuk_music.provider import ZvukMusicProvider
-
         provider = MagicMock(spec=ZvukMusicProvider)
         provider.config = MagicMock()
         provider.config.get_value = MagicMock(return_value="high")
@@ -244,10 +234,9 @@ class TestGetStreamDetailsFlac:
         mock_client.get_track = AsyncMock(
             return_value=_make_mock_track(has_flac=False, duration=333)
         )
-        mock_client.get_direct_stream_url = AsyncMock(
-            return_value="https://cdn.zvuk.com/track.mp3"
-        )
+        mock_client.get_direct_stream_url = AsyncMock(return_value="https://cdn.zvuk.com/track.mp3")
         provider.client = mock_client
+        provider.logger = MagicMock()
 
         result = await ZvukMusicProvider.get_stream_details(provider, "12345")
 
@@ -256,10 +245,6 @@ class TestGetStreamDetailsFlac:
     @pytest.mark.asyncio
     async def test_raises_when_all_urls_none(self) -> None:
         """MediaNotFoundError is raised when all quality attempts return None."""
-        from music_assistant_models.errors import MediaNotFoundError
-
-        from music_assistant.providers.zvuk_music.provider import ZvukMusicProvider
-
         provider = MagicMock(spec=ZvukMusicProvider)
         provider.config = MagicMock()
         provider.config.get_value = MagicMock(return_value="high")
@@ -269,6 +254,7 @@ class TestGetStreamDetailsFlac:
         mock_client.get_track = AsyncMock(return_value=_make_mock_track(has_flac=False))
         mock_client.get_direct_stream_url = AsyncMock(return_value=None)
         provider.client = mock_client
+        provider.logger = MagicMock()
 
         with pytest.raises(MediaNotFoundError):
             await ZvukMusicProvider.get_stream_details(provider, "12345")
