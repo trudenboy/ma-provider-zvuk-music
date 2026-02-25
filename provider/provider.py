@@ -512,11 +512,12 @@ class ZvukMusicProvider(MusicProvider):
         # Build quality fallback chain.
         # /api/tiny/track/stream quality strings: "flac", "high", "mid"
         self.logger.debug(
-            "Stream request for track %s: quality_pref=%s",
+            "Stream request for track %s: quality_pref=%s has_flac=%s",
             item_id,
             quality_str,
+            has_flac,
         )
-        if quality_str == QUALITY_LOSSLESS:
+        if quality_str == QUALITY_LOSSLESS and has_flac:
             quality_chain = [
                 ("flac", ContentType.FLAC, 0),
                 ("high", ContentType.MP3, 320),
