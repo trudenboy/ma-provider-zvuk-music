@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
-from music_assistant_models.enums import ContentType, MediaType, StreamType
+from music_assistant_models.enums import ContentType, MediaType, ProviderFeature, StreamType
 from music_assistant_models.errors import (
     InvalidDataError,
     LoginFailed,
@@ -16,6 +16,7 @@ from music_assistant_models.media_items import (
     Album,
     Artist,
     AudioFormat,
+    BrowseFolder,
     ItemMapping,
     MediaItemMetadata,
     MediaItemType,
@@ -469,6 +470,63 @@ class ZvukMusicProvider(MusicProvider):
                 )
 
         return folders
+
+    async def browse(self, path: str) -> list[MediaItemType | ItemMapping | BrowseFolder]:
+        """Browse provider content as a hierarchical folder tree.
+
+        Root level exposes two folders:
+        - «Плейлисты для вас»: Zvuk AI-generated personalized playlists.
+        - «Подборки»: Editorial genre-themed curated playlists.
+
+        :param path: Browse path (e.g. ``provider_id://`` or ``provider_id://for_you``).
+        :return: List of playlists or BrowseFolders.
+        """
+        if ProviderFeature.BROWSE not in self.supported_features:
+            raise NotImplementedError
+
+        path_parts = path.split("://")[1].split("/") if "://" in path else []
+        subpath = path_parts[0] if path_parts else None
+
+        base = path if path.endswith("//") else path.rstrip("/") + "/"
+
+        if subpath == "for_you":
+            synthesis_playlists = await self.client.get_short_playlists(SYNTHESIS_PLAYLIST_IDS)
+            items: list[MediaItemType | ItemMapping | BrowseFolder] = []
+            for simple_pl in synthesis_playlists:
+                try:
+                    items.append(parse_playlist(self, simple_pl))
+                except InvalidDataError as err:
+                    self.logger.debug("Error parsing synthesis playlist in browse: %s", err)
+            return items
+
+        if subpath == "editorial":
+            editorial_ids = await self.client.get_editorial_playlist_ids()
+            items = []
+            if editorial_ids:
+                editorial_str_ids = [str(pid) for pid in editorial_ids[:DEFAULT_LIMIT]]
+                editorial_playlists = await self.client.get_playlists(editorial_str_ids)
+                for full_pl in editorial_playlists:
+                    try:
+                        items.append(parse_playlist(self, full_pl))
+                    except InvalidDataError as err:
+                        self.logger.debug("Error parsing editorial playlist in browse: %s", err)
+            return items
+
+        # Root level — return top-level folders
+        return [
+            BrowseFolder(
+                item_id="for_you",
+                provider=self.instance_id,
+                path=f"{base}for_you",
+                name="Плейлисты для вас",
+            ),
+            BrowseFolder(
+                item_id="editorial",
+                provider=self.instance_id,
+                path=f"{base}editorial",
+                name="Подборки",
+            ),
+        ]
 
     async def get_track_metadata(self, track: Track) -> MediaItemMetadata | None:
         """Fetch lyrics for a track from Zvuk's lyrics API.
