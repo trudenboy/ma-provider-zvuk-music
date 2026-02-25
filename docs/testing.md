@@ -72,57 +72,6 @@ uv run pytest provider/tests/ --cov=provider/ --cov-report=html
 open htmlcov/index.html
 ```
 
-## E2E тесты (Playwright)
-
-E2E тесты проверяют реальный функционал провайдера через браузер против живого MA-сервера. Запускаются только локально — не в CI.
-
-### Требования
-
-- Docker (для запуска MA)
-- `ZVUK_TOKEN` в файле `.env`
-- Установленные e2e-зависимости и браузер Playwright:
-
-```bash
-uv pip install ".[e2e]"
-playwright install chromium
-```
-
-### Запуск
-
-```bash
-# Все e2e тесты (запускает Docker, ждёт готовности, тестирует, останавливает)
-./scripts/e2e.sh
-
-# Конкретные тесты
-./scripts/e2e.sh -k test_search
-
-# С видимым браузером
-./scripts/e2e.sh --headed
-```
-
-### Структура
-
-```
-tests/e2e/
-  conftest.py       — фикстуры (Docker lifecycle, браузер, авторизация, настройка провайдера)
-  test_connect.py   — провайдер подключается, нет ошибок
-  test_browse.py    — библиотека, плейлисты, обложки
-  test_search.py    — поиск треков/артистов/альбомов/плейлистов
-  test_playback.py  — воспроизведение, отсутствие фриза, seek
-```
-
-### Маркеры
-
-Все e2e тесты помечены `@pytest.mark.e2e` и `@pytest.mark.integration`. Они не затрагивают обычный запуск unit-тестов:
-
-```bash
-# Unit-тесты (по умолчанию в CI)
-pytest tests/ -m "not integration"
-
-# Только e2e
-pytest tests/e2e/ -m e2e
-```
-
 ## Если CI упал
 
 Если тесты или линтеры упали в CI, автоматически создаётся GitHub-задача с меткой `incident:ci`.
