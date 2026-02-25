@@ -136,27 +136,28 @@ class TestGetStreamDetailsFlac:
         mock_client.get_direct_stream_url.assert_called_with("12345", "flac")
 
     @pytest.mark.asyncio
-    async def test_lossless_without_has_flac_uses_high(self) -> None:
-        """When lossless is requested but track has no FLAC, HIGH MP3 is used."""
+    async def test_lossless_always_tries_flac_first(self) -> None:
+        """When lossless is requested, FLAC is always attempted first regardless of has_flac."""
         provider = MagicMock(spec=ZvukMusicProvider)
         provider.config = MagicMock()
         provider.config.get_value = MagicMock(return_value="lossless")
         provider.instance_id = "zvuk_music--test"
 
         mock_client = MagicMock(spec=ZvukMusicClient)
+        # has_flac=False but API actually returns FLAC URL
         mock_client.get_track = AsyncMock(return_value=_make_mock_track(has_flac=False))
-        mock_client.get_direct_stream_url = AsyncMock(return_value="https://cdn.zvuk.com/track.mp3")
+        mock_client.get_direct_stream_url = AsyncMock(
+            return_value="https://cdn.zvuk.com/track.flac"
+        )
         provider.client = mock_client
         provider.logger = MagicMock()
 
         result = await ZvukMusicProvider.get_stream_details(provider, "12345")
 
-        assert result.audio_format.content_type == ContentType.MP3
-        assert result.audio_format.bit_rate == 320
-        # Should call with "high", never "flac"
+        assert result.audio_format.content_type == ContentType.FLAC
+        # Must try flac first even when has_flac=False
         calls = [c.args[1] for c in mock_client.get_direct_stream_url.call_args_list]
-        assert "flac" not in calls
-        assert calls[0] == "high"
+        assert calls[0] == "flac"
 
     @pytest.mark.asyncio
     async def test_flac_url_failure_falls_back_to_high(self) -> None:

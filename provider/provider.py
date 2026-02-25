@@ -490,9 +490,9 @@ class ZvukMusicProvider(MusicProvider):
         """Get stream details for a track.
 
         Uses /api/tiny/track/stream to get a direct (non-DRM) URL. When lossless is
-        requested and the track has FLAC available (``has_flac=True``), requests "flac" quality
-        and returns ContentType.FLAC. Falls back through "high" (320kbps MP3) → "mid"
-        (128kbps MP3). When ``has_flac=False``, FLAC is skipped entirely.
+        requested, always tries "flac" quality first, then falls back through "high"
+        (320kbps MP3) → "mid" (128kbps MP3). The ``has_flac`` field from the API is
+        not reliable enough to skip the FLAC attempt.
 
         :param item_id: The track ID.
         :param media_type: The media type (should be TRACK).
@@ -511,8 +511,6 @@ class ZvukMusicProvider(MusicProvider):
 
         # Build quality fallback chain.
         # /api/tiny/track/stream quality strings: "flac", "high", "mid"
-        # Use has_flac field from the fetched track to skip unnecessary FLAC attempts.
-        has_flac = getattr(track, "has_flac", True) if track is not None else True
         self.logger.debug(
             "Stream request for track %s: quality_pref=%s has_flac=%s",
             item_id,
