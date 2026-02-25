@@ -5,16 +5,18 @@ description: Документация провайдера Zvuk Music для Mus
 <img src="/ma-provider-zvuk-music/zvuk-icon.svg" alt="Zvuk Music" style="width: 64px; float: right; margin: 0 0 1rem 1.5rem;" />
 
 [Music Assistant](https://music-assistant.io) поддерживает [Zvuk Music](https://zvuk.com) — российский стриминговый сервис.
+
 Провайдер создан и поддерживается [TrudenBoy](https://github.com/TrudenBoy).
 
-Реализован на основе библиотеки [zvuk-music](https://github.com/sashkent3/zvuk-music) (неофициальный клиент Zvuk Music API).
+Реализован на основе библиотеки [zvuk-music](https://github.com/sashkent3/zvuk-music) (**неофициальный** клиент Zvuk Music API).
 
 :::caution[Дисклеймер]
 Это **неофициальная** реализация, не имеющая отношения к компании [Zvuk](https://zvuk.com) и её владельцам.
 :::
 
 :::note[Подписка]
-Lossless FLAC доступен только при наличии подписки Zvuk Music. Без подписки доступно качество до 320 kbps.
+Для полноценной работы всех функций, а так же проигрывания Lossless FLAC необходимо наличие подписки [Zvuk Prime](https://zvuk.com/sub). 
+Без подписки полноценная работа провайдера не гарантируется.
 :::
 
 ## Возможности
