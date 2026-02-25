@@ -58,6 +58,7 @@ repos:
         language: system
         types: [text]
         entry: uv run codespell
+        exclude: ^docs-site/package-lock\.json$
 
       - id: detect-private-key
         name: 🕵️ Detect Private Keys

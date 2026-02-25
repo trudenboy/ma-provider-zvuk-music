@@ -16,3 +16,7 @@ ma-server.repo
 .ma-data/
 .ma-data-e2e/
 tests/e2e/
+
+# Starlight docs site
+docs-site/node_modules/
+docs-site/.astro/
