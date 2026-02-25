@@ -5,7 +5,7 @@ description: Documentation for the Zvuk Music provider for Music Assistant
 
 <img src="/ma-provider-zvuk-music/zvuk-icon.svg" alt="Zvuk Music" style="width: 64px; float: right; margin: 0 0 1rem 1.5rem;" />
 
-Music Assistant supports [Zvuk Music](https://zvuk.com) — a Russian music streaming service.
+[Music Assistant](https://music-assistant.io) supports [Zvuk Music](https://zvuk.com) — a Russian music streaming service.
 Contributed and maintained by [TrudenBoy](https://github.com/TrudenBoy).
 
 Built on top of the [zvuk-music](https://github.com/sashkent3/zvuk-music) library (unofficial Zvuk Music API client).
