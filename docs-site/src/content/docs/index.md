@@ -8,10 +8,10 @@ description: Документация провайдера Zvuk Music для Mus
 
 Провайдер создан и поддерживается [TrudenBoy](https://github.com/TrudenBoy).
 
-Реализован на основе библиотеки [zvuk-music](https://github.com/sashkent3/zvuk-music) (**неофициальный** клиент Zvuk Music API).
+Реализован на основе библиотеки [zvuk-music](https://github.com/trudenboy/zvuk-music) (**неофициальный** клиент Zvuk Music API).
 
-:::caution[Дисклеймер]
-Это **неофициальная** реализация, не имеющая отношения к компании [Zvuk](https://zvuk.com) и её владельцам.
+:::caution[Неофициальный провайдер]
+Этот провайдер использует неофициальный клиент [Zvuk Music API](https://github.com/trudenboy/zvuk-music) и не аффилирован с компанией [Zvuk](https://zvuk.com) или её владельцами. API может измениться без предупреждения, что может привести к временной неработоспособности провайдера.
 :::
 
 :::note[Подписка]
