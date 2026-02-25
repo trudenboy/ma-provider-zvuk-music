@@ -1,3 +1,7 @@
+---
+title: Contributing
+---
+
 [← Development](development.md) · [Back to README](../README.md)
 
 # Contributing
