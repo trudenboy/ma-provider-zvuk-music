@@ -1,32 +1,80 @@
 ---
 title: Configuration
-description: Token setup and provider settings for Zvuk Music
+description: How to connect Zvuk Music to Music Assistant — step-by-step guide
 ---
 
-All settings are accessible via **Settings → Music Sources → Zvuk Music**.
+import { Steps } from '@astrojs/starlight/components';
 
-## Options
+The Zvuk Music provider requires an **authorization token** — a unique key tied to your account. This takes about 2 minutes and requires no additional software.
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `token` | Secure string | — | Zvuk Music X-Auth-Token. Required for authentication. See below for how to obtain it. |
-| `quality` | String (enum) | `high` | Preferred audio quality. See [Quality Options](#quality-options) below. |
+## Step 1 — Get your token
 
-### Quality Options
+The token is stored in your browser after you log in to zvuk.com. You don't need to register it anywhere or create it manually.
 
-| Value | Label | Format | Bitrate |
-|-------|-------|--------|---------|
-| `high` | High | MP3 | 320 kbps |
-| `lossless` | Lossless | FLAC | Lossless |
+<Steps>
+1. Sign in to your account at [zvuk.com](https://zvuk.com) in any browser.
 
-## Obtaining a Token
+2. Without closing the site, open this link in the same browser:
+   **[zvuk.com/api/tiny/profile](https://zvuk.com/api/tiny/profile)**
 
-Zvuk Music requires an X-Auth-Token. The provider documentation at
-[music-assistant.io/music-providers/zvuk/](https://music-assistant.io/music-providers/zvuk/)
-explains how to obtain one.
+3. The page will show text in JSON format. Find the `"token"` field and copy its value — a long string of letters and numbers.
 
-## Actions
+   Example (your token will be different):
+   ```json
+   {
+     "token": "abc123def456ghi789..."
+   }
+   ```
+   Copy the value only — without quotes.
+</Steps>
 
-| Action | Description |
-|--------|-------------|
-| Reset authentication | Clears the stored token, allowing you to re-enter credentials. |
+:::tip[Don't see JSON?]
+If the page looks like a normal website rather than plain text — make sure you're signed in at [zvuk.com](https://zvuk.com). Then open the link above again.
+:::
+
+:::note[Your token is like a password]
+Keep your token private. Don't share it publicly — anyone with your token can access your Zvuk Music account.
+:::
+
+---
+
+## Step 2 — Add the provider in Music Assistant
+
+<Steps>
+1. Open **Music Assistant → Settings → Music Sources**.
+
+2. Click **«+ Add»** and select **Zvuk Music**.
+
+3. Paste the copied token into the **«Zvuk Music Token»** field.
+
+4. Choose your preferred **audio quality** (see below).
+
+5. Click **«Save»**.
+
+6. MA will connect to Zvuk Music and start syncing your library.
+</Steps>
+
+---
+
+## Audio Quality
+
+| Option | Format | Bitrate | Who it's for |
+|--------|--------|---------|--------------|
+| **High (default)** | MP3 | 320 kbps | Any account |
+| **Lossless** | FLAC | Lossless | Requires Zvuk Music subscription |
+
+:::note
+If you don't have a Zvuk Music subscription, choose **«High»**. If you select «Lossless» without a subscription, the provider will automatically fall back to MP3 320 kbps.
+:::
+
+---
+
+## If your token stops working
+
+Tokens can expire after some time. Symptoms: the provider stops playing tracks or shows an authentication error.
+
+**Fix:**
+1. Get a new token following Step 1 above
+2. In MA, open the Zvuk Music provider settings
+3. Click **«Reset authentication»**
+4. Enter the new token
