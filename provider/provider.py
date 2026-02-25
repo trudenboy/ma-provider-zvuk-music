@@ -22,8 +22,6 @@ from music_assistant_models.media_items import (
     Track,
 )
 from music_assistant_models.streamdetails import StreamDetails
-from zvuk_music.enums import Quality
-from zvuk_music.exceptions import QualityNotAvailableError, SubscriptionRequiredError
 
 from music_assistant.controllers.cache import use_cache
 from music_assistant.models.music_provider import MusicProvider
@@ -443,83 +441,67 @@ class ZvukMusicProvider(MusicProvider):
 
     # Streaming
 
-    async def get_stream_details(  # noqa: PLR0915
+    async def get_stream_details(
         self, item_id: str, media_type: MediaType = MediaType.TRACK
     ) -> StreamDetails:
         """Get stream details for a track.
+
+        Uses /api/tiny/track/stream to get a direct (non-DRM) URL. When lossless is
+        requested and the track has FLAC available, requests "flac" quality and returns
+        ContentType.FLAC. Falls back through "high" (320kbps MP3) → "mid" (128kbps MP3).
 
         :param item_id: The track ID.
         :param media_type: The media type (should be TRACK).
         :return: StreamDetails for the track.
         :raises MediaNotFoundError: If stream URL cannot be obtained.
         """
-        streams = await self.client.get_stream_urls(item_id)
-        if not streams:
-            raise MediaNotFoundError(f"No stream info available for track {item_id}")
-
-        stream = streams[0]
         quality_pref = self.config.get_value(CONF_QUALITY)
         quality_str = str(quality_pref) if quality_pref is not None else QUALITY_LOSSLESS
 
-        # Select quality with fallback chain
+        # Fetch track metadata for duration.
+        track = await self.client.get_track(item_id)
+        duration: int | None = None
+        if track is not None:
+            if getattr(track, "duration", None) is not None:
+                duration = int(track.duration)
+
+        # Build quality fallback chain.
+        # /api/tiny/track/stream quality strings: "flac", "high", "mid"
+        # Note: has_flac from GraphQL is unreliable (field not in query);
+        # always try FLAC for lossless and fall back if endpoint returns no URL.
+        self.logger.debug(
+            "Stream request for track %s: quality_pref=%s",
+            item_id,
+            quality_str,
+        )
+        if quality_str == QUALITY_LOSSLESS:
+            quality_chain = [
+                ("flac", ContentType.FLAC, 0),
+                ("high", ContentType.MP3, 320),
+                ("mid", ContentType.MP3, 128),
+            ]
+        else:
+            quality_chain = [("high", ContentType.MP3, 320), ("mid", ContentType.MP3, 128)]
+
         url: str | None = None
         content_type = ContentType.UNKNOWN
         bitrate = 0
 
-        if quality_str == QUALITY_LOSSLESS:
-            # Try FLAC -> HIGH -> MID
-            for quality in (Quality.FLAC, Quality.HIGH, Quality.MID):
-                try:
-                    url = stream.get_url(quality)
-                    if quality == Quality.FLAC:
-                        content_type = ContentType.FLAC
-                        bitrate = 0
-                    elif quality == Quality.HIGH:
-                        content_type = ContentType.MP3
-                        bitrate = 320
-                    else:
-                        content_type = ContentType.MP3
-                        bitrate = 128
-                    break
-                except (SubscriptionRequiredError, QualityNotAvailableError):
-                    continue
-        else:
-            # High quality: try HIGH -> MID
-            for quality in (Quality.HIGH, Quality.MID):
-                try:
-                    url = stream.get_url(quality)
-                    if quality == Quality.HIGH:
-                        content_type = ContentType.MP3
-                        bitrate = 320
-                    else:
-                        content_type = ContentType.MP3
-                        bitrate = 128
-                    break
-                except (SubscriptionRequiredError, QualityNotAvailableError):
-                    continue
-
-        # Ultimate fallback
-        if not url:
-            best_quality, url = stream.get_best_available()
-            if best_quality == Quality.FLAC:
-                content_type = ContentType.FLAC
-                bitrate = 0
-            elif best_quality == Quality.HIGH:
-                content_type = ContentType.MP3
-                bitrate = 320
-            else:
-                content_type = ContentType.MP3
-                bitrate = 128
+        for q_str, q_content_type, q_bitrate in quality_chain:
+            url = await self.client.get_direct_stream_url(item_id, q_str)
+            self.logger.debug(
+                "Stream URL for track %s quality=%s: %s",
+                item_id,
+                q_str,
+                "OK" if url else "None",
+            )
+            if url:
+                content_type = q_content_type
+                bitrate = q_bitrate
+                break
 
         if not url:
             raise MediaNotFoundError(f"No stream URL available for track {item_id}")
-
-        # zvuk-music Stream model (get_stream_urls) has no duration; only expire and URLs.
-        # Fetch track for duration so StreamDetails can expose it (e.g. for progress/seeking).
-        track = await self.client.get_track(item_id)
-        duration: int | None = None
-        if track is not None and getattr(track, "duration", None) is not None:
-            duration = int(track.duration)
 
         return StreamDetails(
             item_id=item_id,

@@ -1,0 +1,27 @@
+# E2E testing docker-compose for Zvuk Music
+# Uses an isolated data dir (.ma-data-e2e/) separate from dev environment.
+#
+# Usage (via scripts/e2e.sh):
+#   ZVUK_TOKEN=<token> docker compose -f docker-compose.e2e.yml up -d
+#   docker compose -f docker-compose.e2e.yml down
+#
+# Or set ZVUK_TOKEN in .env — scripts/e2e.sh loads it automatically.
+
+services:
+  ma:
+    image: ghcr.io/music-assistant/server:nightly
+    ports:
+      - "8095:8095"
+      - "8097:8097"
+      - "8099:8099"
+      - "8927:8927"
+    privileged: true
+    restart: "no"
+    environment:
+      - ZVUK_TOKEN=${ZVUK_TOKEN:-}
+    volumes:
+      - ./.ma-data-e2e:/data
+      - ./provider/:/tmp/provider:ro
+      - ./pyproject.toml:/tmp/pyproject.toml:ro
+      - ./scripts/docker-init.sh:/init.sh:ro
+    entrypoint: ["/bin/sh", "/init.sh"]

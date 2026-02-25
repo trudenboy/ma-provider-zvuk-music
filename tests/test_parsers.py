@@ -534,3 +534,23 @@ class TestParsePlaylist:
         result = parse_playlist(mock_provider, playlist_obj)
 
         assert result.name == "Unknown Playlist"
+
+    def test_parse_playlist_image_src_none(self, mock_provider: Mock) -> None:
+        """Test parsing a playlist whose Image object has src=None does not raise.
+
+        Regression test for AttributeError when image.get_url() is called with src=None.
+        Zvuk API returns Image objects with src=None for user-created playlists without covers.
+        """
+        image = Mock()
+        image.src = None
+        image.get_url = Mock(
+            side_effect=AttributeError("'NoneType' object has no attribute 'startswith'")
+        )
+        playlist_obj = _create_mock_playlist(
+            playlist_id=999, title="Playlist No Cover", image=image
+        )
+
+        result = parse_playlist(mock_provider, playlist_obj)
+
+        assert result.name == "Playlist No Cover"
+        assert result.metadata.images is None or len(result.metadata.images) == 0

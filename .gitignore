@@ -13,3 +13,6 @@ coverage.xml
 htmlcov/
 .env
 ma-server.repo
+.ma-data/
+.ma-data-e2e/
+tests/e2e/

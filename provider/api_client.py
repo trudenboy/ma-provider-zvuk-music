@@ -29,6 +29,7 @@ from zvuk_music.exceptions import (
     TimedOutError,
     UnauthorizedError,
 )
+from zvuk_music.utils.request_async import TINY_API_URL
 
 from .constants import DEFAULT_LIMIT
 
@@ -298,6 +299,27 @@ class ZvukMusicClient:
         """
         client = self._ensure_connected()
         return await client.get_stream_urls(track_id)
+
+    @handle_zvuk_errors(not_found_return=None)
+    async def get_direct_stream_url(self, track_id: str, quality: str) -> str | None:
+        """Get a direct (non-DRM) stream URL for a track via /api/tiny/track/stream.
+
+        Unlike get_stream_urls() which uses the tracks endpoint and returns a DRM-protected
+        FLAC URL (flacdrm), this method calls the dedicated stream endpoint which returns a
+        plain, decodable URL. Used by zvuk-dl-rs to download lossless FLAC.
+
+        :param track_id: Track ID.
+        :param quality: Quality string — "flac", "high", or "mid".
+        :return: Stream URL string, or None if not found.
+        """
+        client = self._ensure_connected()
+        result = await client._request.get(
+            f"{TINY_API_URL}/track/stream",
+            params={"quality": quality, "id": track_id},
+        )
+        if not result or "stream" not in result:
+            return None
+        return str(result["stream"])
 
     # Collection (Library)
 
