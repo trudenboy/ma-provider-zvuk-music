@@ -23,6 +23,18 @@ export default defineConfig({
 			sidebar: [
 				{ label: 'Главная / Home', translations: { en: 'Home' }, slug: 'index' },
 				{ label: 'Настройка', translations: { en: 'Configuration' }, slug: 'configuration' },
+				{
+					label: 'Возможности',
+					translations: { en: 'Features' },
+					items: [
+						{ label: 'Рекомендации', translations: { en: 'Recommendations' }, slug: 'features/recommendations' },
+						{ label: 'Тексты песен', translations: { en: 'Lyrics' }, slug: 'features/lyrics' },
+						{ label: 'Похожие треки', translations: { en: 'Similar Tracks' }, slug: 'features/similar-tracks' },
+						{ label: 'Библиотека и синхронизация', translations: { en: 'Library & Sync' }, slug: 'features/library' },
+						{ label: 'Поиск', translations: { en: 'Search' }, slug: 'features/search' },
+						{ label: 'Качество звука', translations: { en: 'Audio Quality' }, slug: 'features/audio-quality' },
+					],
+				},
 				{ label: 'Известные проблемы', translations: { en: 'Known Issues' }, slug: 'known-issues' },
 				{
 					label: 'Разработка',
