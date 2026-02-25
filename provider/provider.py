@@ -495,6 +495,25 @@ class ZvukMusicProvider(MusicProvider):
             metadata.lyrics = lyrics_text
         return metadata
 
+    async def resolve_image(self, path: str) -> str | bytes:
+        """Fetch a Zvuk static playlist image with authentication.
+
+        Called by MA when a ``MediaItemImage`` has ``remotely_accessible=False``.
+        Static playlist avatar images (``/static/avatar/playlist/...``) require
+        Zvuk auth cookies and cannot be fetched anonymously.
+
+        :param path: Full image URL (e.g. ``https://zvuk.com/static/avatar/...``).
+        :return: Raw image bytes on success, original URL string as fallback.
+        """
+        token = self.config.get_value(CONF_TOKEN)
+        try:
+            async with self.mass.http_session.get(path, cookies={"auth": str(token)}) as resp:
+                if resp.status == 200:
+                    return await resp.read()
+        except Exception as err:
+            self.logger.debug("Failed to resolve static image %s: %s", path, err)
+        return path
+
     # Library edit methods
 
     async def library_add(self, item: MediaItemType) -> bool:
