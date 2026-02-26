@@ -430,12 +430,16 @@ class ZvukMusicClient:
         Fetches lyrics from ``/api/tiny/lyrics?track_id={id}``.
         Returns synced LRC text (type ``'subtitle'``) or plain text (type ``'lyrics'``).
         Returns ``None`` if the track has no lyrics.
+        Uses the library's request infrastructure (proper browser headers + auto-unwraps
+        the outer {"result": {...}} wrapper).
 
         :param track_id: Track ID.
         :return: Dict with ``lyrics`` (str or None), ``type`` (str or None),
             ``translation`` (str or None), or None on error.
         """
-        result = await self._tiny_get("lyrics", {"track_id": track_id})
+        client = self._ensure_connected()
+        url = f"{TINY_API_URL}/lyrics"
+        result = await client._request.get(url, params={"track_id": track_id})
         if not result or not result.get("lyrics"):
             return None
         return result
