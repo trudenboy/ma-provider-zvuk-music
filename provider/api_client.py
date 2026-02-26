@@ -331,15 +331,17 @@ class ZvukMusicClient:
     async def get_direct_stream_url(self, track_id: str, quality: str) -> str | None:
         """Get a direct (non-DRM) stream URL for a track via /api/tiny/track/stream.
 
-        Unlike get_stream_urls() which uses the tracks endpoint and returns a DRM-protected
-        FLAC URL (flacdrm), this method calls the dedicated stream endpoint which returns a
-        plain, decodable URL. Used by zvuk-dl-rs to download lossless FLAC.
+        Uses the zvuk_music library's own request infrastructure (with proper browser headers
+        and auth) instead of the shared MA http session. The library's Request.get() already
+        handles the {"result": {...}} wrapping, so the returned dict is the inner result.
 
         :param track_id: Track ID.
         :param quality: Quality string — "flac", "high", or "mid".
         :return: Stream URL string, or None if not found.
         """
-        result = await self._tiny_get("track/stream", {"quality": quality, "id": track_id})
+        client = self._ensure_connected()
+        url = f"{TINY_API_URL}/track/stream"
+        result = await client._request.get(url, params={"quality": quality, "id": track_id})
         if not result or "stream" not in result:
             return None
         return str(result["stream"])

@@ -716,8 +716,9 @@ class ZvukMusicProvider(MusicProvider):
             if getattr(track, "has_flac", None) is not None:
                 has_flac = bool(track.has_flac)
 
-        # Build quality fallback chain.
-        # /api/tiny/track/stream quality strings: "flac", "high", "mid"
+        # Build quality fallback chain using /api/tiny/track/stream (plain, non-DRM URLs).
+        # This endpoint returns {"result": {"stream": "https://..."}} for FLAC/MP3 qualities.
+        # zvuk-dl-rs uses the same endpoint to download lossless FLAC.
         self.logger.debug(
             "Stream request for track %s: quality_pref=%s has_flac=%s (diagnostic only)",
             item_id,
