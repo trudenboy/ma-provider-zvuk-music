@@ -569,12 +569,12 @@ class ZvukMusicProvider(MusicProvider):
         Zvuk auth cookies and cannot be fetched anonymously.
 
         Only sends the auth token to trusted Zvuk domains (``zvuk.com``,
-        ``cdn.zvuk.com``) to prevent token leakage to arbitrary hosts.
+        ``cdn.zvuk.com``, ``cdn-image.zvuk.com``) to prevent token leakage to arbitrary hosts.
 
         :param path: Full image URL (e.g. ``https://zvuk.com/static/avatar/...``).
         :return: Raw image bytes on success, original URL string as fallback.
         """
-        _zvuk_image_hosts = frozenset({"zvuk.com", "cdn.zvuk.com"})
+        _zvuk_image_hosts = frozenset({"zvuk.com", "cdn.zvuk.com", "cdn-image.zvuk.com"})
         parsed = urlparse(path)
         if parsed.hostname not in _zvuk_image_hosts:
             self.logger.warning("Refusing to fetch image from untrusted host: %s", parsed.hostname)
