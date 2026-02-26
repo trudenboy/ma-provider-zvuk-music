@@ -122,28 +122,6 @@ class ZvukMusicClient:
         self._client = None
         self._user_id = None
 
-    async def _tiny_get(self, path: str, params: dict[str, str]) -> dict[str, Any] | None:
-        """Perform an authenticated GET to a /api/tiny endpoint.
-
-        Reuses the shared ``http_session`` passed at construction to benefit from
-        connection pooling and avoid per-call session overhead.
-
-        :param path: Endpoint path relative to TINY_API_URL (e.g. ``"lyrics"``).
-        :param params: Query parameters.
-        :return: Parsed JSON dict, or None on non-200 response or empty body.
-        """
-        url = f"{TINY_API_URL}/{path}"
-        try:
-            async with self._http_session.get(
-                url, params=params, headers={"X-Auth-Token": self._token}
-            ) as resp:
-                if resp.status != 200:
-                    return None
-                return cast("dict[str, Any]", await resp.json())
-        except Exception as err:
-            LOGGER.debug("Tiny API request to %s failed: %s", url, err)
-            return None
-
     def _ensure_connected(self) -> ClientAsync:
         """Ensure the client is connected and return it."""
         if self._client is None:
@@ -348,7 +326,7 @@ class ZvukMusicClient:
 
     # Collection (Library)
 
-    @handle_zvuk_errors()
+    @handle_zvuk_errors(not_found_return=None)
     async def get_collection(self) -> Collection | None:
         """Get user's collection (liked items).
 
@@ -391,14 +369,14 @@ class ZvukMusicClient:
         return await client.get_short_playlist(list(playlist_ids))
 
     @handle_zvuk_errors(not_found_return=[])
-    async def get_editorial_playlist_ids(self) -> list[int]:
+    async def get_editorial_playlist_ids(self) -> list[str]:
         """Get editorial (curated) playlist IDs from Zvuk's grid content API.
 
         Fetches «Подборки» — genre-focused curated playlists shown on the home page.
         Uses the library's request infrastructure (proper browser headers + auto-unwraps
         the outer {"result": {...}} wrapper), so the returned dict is the inner result.
 
-        :return: List of playlist IDs.
+        :return: List of playlist IDs as strings.
         """
         client = self._ensure_connected()
         url = f"{TINY_API_URL}/grid/content"
@@ -410,17 +388,13 @@ class ZvukMusicClient:
         # Library unwraps {"result": {...}}, so result is already the inner dict.
         # Inner structure: {'page': {'data': [{'type': 'playlist', 'id': 123}, ...]}, ...}
         data = result.get("page", {}).get("data", [])
-        playlist_ids: list[int] = []
+        playlist_ids: list[str] = []
         for item in data:
             if item.get("type") != "playlist":
                 continue
             raw_id = item.get("id")
-            if raw_id is None:
-                continue
-            try:
-                playlist_ids.append(int(raw_id))
-            except (TypeError, ValueError):
-                continue
+            if raw_id is not None:
+                playlist_ids.append(str(raw_id))
         return playlist_ids
 
     @handle_zvuk_errors(not_found_return=None)

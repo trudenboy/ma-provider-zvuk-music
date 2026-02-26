@@ -5,12 +5,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
+import aiohttp
 from music_assistant_models.enums import ContentType, MediaType, ProviderFeature, StreamType
 from music_assistant_models.errors import (
     InvalidDataError,
     LoginFailed,
     MediaNotFoundError,
     ProviderUnavailableError,
+    ResourceTemporarilyUnavailable,
 )
 from music_assistant_models.media_items import (
     Album,
@@ -449,8 +451,7 @@ class ZvukMusicProvider(MusicProvider):
         # Folder 2: Editorial curated playlists («Подборки»)
         editorial_ids = await self.client.get_editorial_playlist_ids()
         if editorial_ids:
-            editorial_str_ids = [str(pid) for pid in editorial_ids[:DEFAULT_LIMIT]]
-            editorial_playlists = await self.client.get_playlists(editorial_str_ids)
+            editorial_playlists = await self.client.get_playlists(editorial_ids[:DEFAULT_LIMIT])
             editorial_items: list[Playlist] = []
             for full_pl in editorial_playlists:
                 try:
@@ -503,8 +504,7 @@ class ZvukMusicProvider(MusicProvider):
             editorial_ids = await self.client.get_editorial_playlist_ids()
             items = []
             if editorial_ids:
-                editorial_str_ids = [str(pid) for pid in editorial_ids[:DEFAULT_LIMIT]]
-                editorial_playlists = await self.client.get_playlists(editorial_str_ids)
+                editorial_playlists = await self.client.get_playlists(editorial_ids[:DEFAULT_LIMIT])
                 for full_pl in editorial_playlists:
                     try:
                         items.append(parse_playlist(self, full_pl))
@@ -543,7 +543,7 @@ class ZvukMusicProvider(MusicProvider):
         track_id = track.item_id
         try:
             result = await self.client.get_lyrics(track_id)
-        except Exception as err:
+        except (ResourceTemporarilyUnavailable, ProviderUnavailableError) as err:
             self.logger.debug("Failed to fetch lyrics for track %s: %s", track_id, err)
             return None
         if not result:
@@ -580,6 +580,8 @@ class ZvukMusicProvider(MusicProvider):
             self.logger.warning("Refusing to fetch image from untrusted host: %s", parsed.hostname)
             return str(path)
         token = self.config.get_value(CONF_TOKEN)
+        if not token:
+            return str(path)
         try:
             async with self.mass.http_session.get(
                 path,
@@ -596,7 +598,7 @@ class ZvukMusicProvider(MusicProvider):
             ) as resp:
                 if resp.status == 200:
                     return bytes(await resp.read())
-        except Exception as err:
+        except (aiohttp.ClientError, TimeoutError) as err:
             self.logger.debug("Failed to resolve static image %s: %s", path, err)
         return str(path)
 
