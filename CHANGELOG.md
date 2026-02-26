@@ -101,4 +101,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.0] - 2026-02-26
+
+## What's Changed
+* fix(tests): use cast to avoid type: ignore in test_lyrics by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/61
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/62
+* fix(tests): use music_assistant imports + upstream CI script by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/63
+* fix: address PR #3242 Copilot review comments by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/64
+* fix(parsers): use isinstance check for playlist image src by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/65
+* fix(security,api_client): decouple _request, validate resolve_image domain by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/66
+* test(stream_details): update mocks for _tiny_get in get_direct_stream_url by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/67
+* fix(api_client): use shared http_session instead of per-call aiohttp.ClientSession by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/68
+* fix: remove unused type: ignore[attr-defined] comments in test_stream_details by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/69
+* chore: migrate docs site from MkDocs to Astro Starlight by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/70
+* chore: migrate docs to Astro Starlight + align with Yandex Music format by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/71
+* docs: add dedicated Features section by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/72
+* fix: remove duplicate heading, add Zvuk Music icon to index pages by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/73
+* feat(browse): implement browse method and add RU/EN docs by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/74
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/75
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/76
+
+
+**Full Changelog**: https://github.com/trudenboy/ma-provider-zvuk-music/compare/v1.6.0...v1.7.0
+
+---
+
 <!-- changelog entries will be added here by release workflow -->
