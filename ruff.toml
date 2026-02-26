@@ -100,10 +100,5 @@ max-complexity = 25
 fixture-parentheses = false
 mark-parentheses = false
 
-[lint.per-file-ignores]
-# B010: setattr() with literal names is intentional in tests to work around
-# mypy's [method-assign] restriction on typed method replacement with mocks.
-"tests/**/*.py" = ["B010"]
-
 [lint.isort]
 known-first-party = ["music_assistant"]
