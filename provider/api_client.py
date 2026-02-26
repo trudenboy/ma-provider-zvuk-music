@@ -185,8 +185,7 @@ class ZvukMusicClient:
         :return: List of track objects.
         """
         client = self._ensure_connected()
-        ids: list[str | int] = list(track_ids)
-        return await client.get_tracks(ids)
+        return await client.get_tracks(list(track_ids))
 
     @handle_zvuk_errors(not_found_return=None)
     async def get_release(self, release_id: str) -> ZvukRelease | None:
@@ -206,8 +205,7 @@ class ZvukMusicClient:
         :return: List of release objects.
         """
         client = self._ensure_connected()
-        ids: list[str | int] = list(release_ids)
-        return await client.get_releases(ids)
+        return await client.get_releases(list(release_ids))
 
     @handle_zvuk_errors(not_found_return=None)
     async def get_artist(self, artist_id: str) -> ZvukArtist | None:
@@ -227,8 +225,7 @@ class ZvukMusicClient:
         :return: List of artist objects.
         """
         client = self._ensure_connected()
-        ids: list[str | int] = list(artist_ids)
-        return await client.get_artists(ids)
+        return await client.get_artists(list(artist_ids))
 
     @handle_zvuk_errors(not_found_return=[])
     async def get_artist_releases(
@@ -276,8 +273,7 @@ class ZvukMusicClient:
         :return: List of playlist objects.
         """
         client = self._ensure_connected()
-        ids: list[str | int] = list(playlist_ids)
-        return await client.get_playlists(ids)
+        return await client.get_playlists(list(playlist_ids))
 
     @handle_zvuk_errors(not_found_return=[])
     async def get_playlist_tracks(
