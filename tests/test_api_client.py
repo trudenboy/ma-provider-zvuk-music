@@ -21,6 +21,7 @@ from zvuk_music.exceptions import (
     UnauthorizedError,
 )
 
+from music_assistant.helpers.throttle_retry import Throttler
 from music_assistant.providers.zvuk_music.api_client import ZvukMusicClient, handle_zvuk_errors
 
 # ---------------------------------------------------------------------------
@@ -535,6 +536,16 @@ class TestGetLyrics:
 # ---------------------------------------------------------------------------
 # Tests for like_track() / unlike_track()
 # ---------------------------------------------------------------------------
+
+
+class TestThrottler:
+    """Tests for throttling behaviour in ZvukMusicClient."""
+
+    def test_throttler_initialized_on_construction(self) -> None:
+        """ZvukMusicClient should have a _throttler attribute after construction."""
+        client = _make_client()
+        assert hasattr(client, "_throttler")
+        assert isinstance(client._throttler, Throttler)
 
 
 class TestLikeUnlikeTrack:

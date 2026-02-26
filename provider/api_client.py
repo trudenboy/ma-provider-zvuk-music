@@ -34,6 +34,8 @@ from zvuk_music.exceptions import (
 )
 from zvuk_music.utils.request_async import TINY_API_URL
 
+from music_assistant.helpers.throttle_retry import Throttler
+
 from .constants import DEFAULT_LIMIT
 
 LOGGER = logging.getLogger(__name__)
@@ -89,6 +91,7 @@ class ZvukMusicClient:
         self._http_session = http_session
         self._client: ClientAsync | None = None
         self._user_id: str | None = None
+        self._throttler = Throttler(rate_limit=5, period=1.0)
 
     @property
     def user_id(self) -> str:
