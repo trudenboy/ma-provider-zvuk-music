@@ -131,6 +131,18 @@ class ZvukMusicClient:
             raise ProviderUnavailableError("Client not connected, call connect() first")
         return self._client
 
+    def _is_rate_limit_error(self, err: Exception) -> bool:
+        """Return True if the exception indicates a rate-limit response from Zvuk."""
+        if not isinstance(err, NetworkError):
+            return False
+        msg = str(err).lower()
+        return "429" in msg or "too many requests" in msg or "rate limit" in msg
+
+    async def _get_client(self) -> ClientAsync:
+        """Acquire a throttle slot then return the connected client."""
+        await self._throttler.acquire()
+        return self._ensure_connected()
+
     # Search
 
     @handle_zvuk_errors(not_found_return=None)

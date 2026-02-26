@@ -548,6 +548,66 @@ class TestThrottler:
         assert isinstance(client._throttler, Throttler)
 
 
+class TestIsRateLimitError:
+    """Tests for ZvukMusicClient._is_rate_limit_error()."""
+
+    def test_returns_false_for_non_network_error(self) -> None:
+        """Non-NetworkError always returns False."""
+        client = _make_client()
+        assert client._is_rate_limit_error(ValueError("429")) is False
+
+    def test_returns_false_for_generic_network_error(self) -> None:
+        """Generic NetworkError (no 429/rate-limit marker) returns False."""
+        client = _make_client()
+        assert client._is_rate_limit_error(NetworkError("connection reset")) is False
+
+    def test_returns_true_for_429_in_message(self) -> None:
+        """NetworkError whose message contains '429' returns True."""
+        client = _make_client()
+        assert client._is_rate_limit_error(NetworkError("HTTP 429")) is True
+
+    def test_returns_true_for_too_many_requests(self) -> None:
+        """NetworkError whose message contains 'Too Many Requests' returns True."""
+        client = _make_client()
+        assert client._is_rate_limit_error(NetworkError("Too Many Requests")) is True
+
+    def test_returns_true_for_rate_limit_in_message(self) -> None:
+        """NetworkError whose message contains 'rate limit' returns True."""
+        client = _make_client()
+        assert client._is_rate_limit_error(NetworkError("rate limit exceeded")) is True
+
+    def test_returns_false_for_too_many_values_false_positive(self) -> None:
+        """'too many values to unpack' must not be a false positive."""
+        client = _make_client()
+        assert client._is_rate_limit_error(NetworkError("too many values to unpack")) is False
+
+
+class TestGetClient:
+    """Tests for ZvukMusicClient._get_client()."""
+
+    @pytest.mark.asyncio
+    async def test_get_client_acquires_throttle_slot(self) -> None:
+        """_get_client() must call throttler.acquire() before returning client."""
+        client, inner = _make_connected_client()
+        client._throttler = MagicMock()
+        client._throttler.acquire = AsyncMock()
+
+        result = await client._get_client()
+
+        client._throttler.acquire.assert_awaited_once()
+        assert result is inner
+
+    @pytest.mark.asyncio
+    async def test_get_client_raises_when_not_connected(self) -> None:
+        """_get_client() raises ProviderUnavailableError if client not connected."""
+        client = _make_client()
+        client._throttler = MagicMock()
+        client._throttler.acquire = AsyncMock()
+
+        with pytest.raises(ProviderUnavailableError):
+            await client._get_client()
+
+
 class TestLikeUnlikeTrack:
     """Tests for ZvukMusicClient.like_track() and unlike_track()."""
 
