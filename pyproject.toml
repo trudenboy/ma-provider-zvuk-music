@@ -183,14 +183,6 @@ no_implicit_optional = true
 no_implicit_reexport = true
 packages = ["tests", "provider"]
 show_error_codes = true
-
-# provider.py subclasses MusicProvider and uses use_cache (untyped decorator) from ma-server;
-# relax rules that trip on third-party base class typing
-[[tool.mypy.overrides]]
-module = "provider.provider"
-disallow_subclassing_any = false
-disallow_untyped_decorators = false
-no_any_return = false
 strict_equality = true
 strict_optional = true
 warn_incomplete_stub = true
@@ -200,3 +192,10 @@ warn_return_any = true
 warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
+
+# provider.py subclasses MusicProvider and uses use_cache (untyped decorator) from ma-server;
+# relax rules that trip on third-party base class typing
+[[tool.mypy.overrides]]
+module = "provider.provider"
+disallow_subclassing_any = false
+disallow_untyped_decorators = false
