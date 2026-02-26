@@ -48,112 +48,6 @@ markers = [
 ignore-words-list = "provid,hass,followings,childs,explict,additionals,commitish,nam,"
 skip = "*.js,*.svg"
 
-[tool.ruff]
-fix = true
-show-fixes = true
-line-length = 100
-target-version = "py312"
-
-[tool.ruff.format]
-line-ending = "lf"
-
-[tool.ruff.lint.pydocstyle]
-convention = "pep257"
-
-[tool.ruff.lint.pylint]
-max-args = 10
-max-branches = 25
-max-returns = 15
-max-statements = 50
-
-[tool.ruff.lint.mccabe]
-max-complexity = 25
-
-[tool.ruff.lint.flake8-pytest-style]
-fixture-parentheses = false
-mark-parentheses = false
-
-[tool.ruff.lint.isort]
-known-first-party = ["music_assistant"]
-
-[tool.ruff.lint]
-ignore = [
-  "ANN002",
-  "ANN003",
-  "ANN401",
-  "D203",
-  "D213",
-  "D417",
-  "EM101",
-  "EM102",
-  "FIX002",
-  "PLR2004",
-  "PGH004",
-  "PD011",
-  "S101",
-  "TC001",
-  "TC003",
-  "TD002",
-  "TD003",
-  "TD004",
-  "TRY003",
-  "TRY400",
-  "COM812",
-  "ASYNC109",
-  "ASYNC110",
-  "N818",
-  "BLE001",
-  "FBT001",
-  "FBT002",
-  "FBT003",
-  "ANN001",
-  "ANN201",
-  "ANN202",
-  "TRY002",
-  "PTH103",
-  "PTH100",
-  "PTH110",
-  "PTH111",
-  "PTH112",
-  "PTH113",
-  "PTH118",
-  "PTH120",
-  "PTH123",
-  "PYI034",
-  "G004",
-  "PGH003",
-  "DTZ005",
-  "S104",
-  "S105",
-  "S106",
-  "SLF001",
-  "SIM102",
-  "PERF401",
-  "PERF402",
-  "ARG002",
-  "S311",
-  "TRY301",
-  "PLR0912",
-  "B904",
-  "TRY401",
-  "S324",
-  "DTZ006",
-  "ERA001",
-  "PTH206",
-  "C901",
-  "PTH119",
-  "PTH116",
-  "RUF012",
-  "S304",
-  "RUF006",
-  "TRY300",
-  "S608",
-  "S307",
-  "B007",
-  "ANN204",
-]
-select = ["ALL"]
-
 [tool.mypy]
 python_version = "3.12"
 platform = "linux"
@@ -198,4 +92,10 @@ warn_unused_ignores = true
 [[tool.mypy.overrides]]
 module = "provider.provider"
 disallow_subclassing_any = false
+disallow_untyped_decorators = false
+
+# Tests use handle_zvuk_errors() as a decorator on local async functions; mypy 1.19.1 cannot
+# resolve ParamSpec + Awaitable in this context and incorrectly flags [untyped-decorator].
+[[tool.mypy.overrides]]
+module = "tests.*"
 disallow_untyped_decorators = false
