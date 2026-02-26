@@ -395,15 +395,20 @@ class ZvukMusicClient:
         """Get editorial (curated) playlist IDs from Zvuk's grid content API.
 
         Fetches «Подборки» — genre-focused curated playlists shown on the home page.
+        Uses the library's request infrastructure (proper browser headers + auto-unwraps
+        the outer {"result": {...}} wrapper), so the returned dict is the inner result.
 
         :return: List of playlist IDs.
         """
-        result = await self._tiny_get(
-            "grid/content", {"name": "editorial_playlist", "ranker_enabled": "true"}
+        client = self._ensure_connected()
+        url = f"{TINY_API_URL}/grid/content"
+        result = await client._request.get(
+            url, params={"name": "editorial_playlist", "ranker_enabled": "true"}
         )
         if not result:
             return []
-        # Response: {'page': {'data': [{'type': 'playlist', 'id': 123}, ...]}, ...}
+        # Library unwraps {"result": {...}}, so result is already the inner dict.
+        # Inner structure: {'page': {'data': [{'type': 'playlist', 'id': 123}, ...]}, ...}
         data = result.get("page", {}).get("data", [])
         playlist_ids: list[int] = []
         for item in data:
