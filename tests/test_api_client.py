@@ -155,6 +155,39 @@ class TestHandleZvukErrors:
 
 
 # ---------------------------------------------------------------------------
+# Tests for handle_zvuk_errors — rate-limit backoff
+# ---------------------------------------------------------------------------
+
+
+class TestHandleZvukErrorsRateLimit:
+    """Test that 429 NetworkError gets backoff treatment."""
+
+    @pytest.mark.asyncio
+    async def test_rate_limit_network_error_raises_with_backoff(self) -> None:
+        """NetworkError with 429 raises ResourceTemporarilyUnavailable(backoff_time=60)."""
+
+        @handle_zvuk_errors()
+        async def failing(_self: object) -> None:
+            raise NetworkError("HTTP 429 Too Many Requests")
+
+        with pytest.raises(ResourceTemporarilyUnavailable) as exc_info:
+            await failing(None)
+        assert exc_info.value.backoff_time == 60
+
+    @pytest.mark.asyncio
+    async def test_generic_network_error_raises_without_backoff(self) -> None:
+        """Ordinary NetworkError raises ResourceTemporarilyUnavailable without backoff."""
+
+        @handle_zvuk_errors()
+        async def failing(_self: object) -> None:
+            raise NetworkError("connection reset")
+
+        with pytest.raises(ResourceTemporarilyUnavailable) as exc_info:
+            await failing(None)
+        assert getattr(exc_info.value, "backoff_time", None) != 60
+
+
+# ---------------------------------------------------------------------------
 # Tests for connect()
 # ---------------------------------------------------------------------------
 

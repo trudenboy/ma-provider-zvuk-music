@@ -60,7 +60,15 @@ def handle_zvuk_errors(
                 return await func(*args, **kwargs)
             except UnauthorizedError as err:
                 raise LoginFailed("Invalid Zvuk Music token") from err
-            except (NetworkError, TimedOutError) as err:
+            except NetworkError as err:
+                msg = str(err).lower()
+                if "429" in msg or "too many requests" in msg or "rate limit" in msg:
+                    raise ResourceTemporarilyUnavailable(
+                        "Zvuk Music rate limit", backoff_time=60
+                    ) from err
+                LOGGER.error("Zvuk API error: %s", err)
+                raise ResourceTemporarilyUnavailable("Zvuk Music request failed") from err
+            except TimedOutError as err:
                 LOGGER.error("Zvuk API error: %s", err)
                 raise ResourceTemporarilyUnavailable("Zvuk Music request failed") from err
             except (BadRequestError, GraphQLError) as err:
