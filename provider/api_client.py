@@ -174,7 +174,7 @@ class ZvukMusicClient:
         :param search_playlists: Whether to search for playlists.
         :return: Search results object or None.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.search(
             query,
             limit=limit,
@@ -197,7 +197,7 @@ class ZvukMusicClient:
         :param track_id: Track ID.
         :return: Track object or None if not found.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_track(track_id)
 
     @handle_zvuk_errors(not_found_return=[])
@@ -207,7 +207,7 @@ class ZvukMusicClient:
         :param track_ids: List of track IDs.
         :return: List of track objects.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_tracks(list(track_ids))
 
     @handle_zvuk_errors(not_found_return=None)
@@ -217,7 +217,7 @@ class ZvukMusicClient:
         :param release_id: Release ID.
         :return: Release object or None if not found.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_release(release_id)
 
     @handle_zvuk_errors(not_found_return=[])
@@ -227,7 +227,7 @@ class ZvukMusicClient:
         :param release_ids: List of release IDs.
         :return: List of release objects.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_releases(list(release_ids))
 
     @handle_zvuk_errors(not_found_return=None)
@@ -237,7 +237,7 @@ class ZvukMusicClient:
         :param artist_id: Artist ID.
         :return: Artist object or None if not found.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_artist(artist_id, with_description=True)
 
     @handle_zvuk_errors(not_found_return=[])
@@ -247,7 +247,7 @@ class ZvukMusicClient:
         :param artist_ids: List of artist IDs.
         :return: List of artist objects.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_artists(list(artist_ids))
 
     @handle_zvuk_errors(not_found_return=[])
@@ -260,7 +260,7 @@ class ZvukMusicClient:
         :param limit: Maximum number of releases.
         :return: List of artist objects with populated releases.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_artists([artist_id], with_releases=True, releases_limit=limit)
 
     @handle_zvuk_errors(not_found_return=[])
@@ -273,7 +273,7 @@ class ZvukMusicClient:
         :param limit: Maximum number of tracks.
         :return: List of artist objects with populated popular_tracks.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_artists([artist_id], with_popular_tracks=True, tracks_limit=limit)
 
     # Playlists
@@ -285,7 +285,7 @@ class ZvukMusicClient:
         :param playlist_id: Playlist ID.
         :return: Playlist object or None if not found.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_playlist(playlist_id)
 
     @handle_zvuk_errors(not_found_return=[])
@@ -295,7 +295,7 @@ class ZvukMusicClient:
         :param playlist_ids: List of playlist IDs.
         :return: List of playlist objects.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_playlists(list(playlist_ids))
 
     @handle_zvuk_errors(not_found_return=[])
@@ -309,7 +309,7 @@ class ZvukMusicClient:
         :param offset: Offset for pagination.
         :return: List of SimpleTrack objects.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_playlist_tracks(playlist_id, limit=limit, offset=offset)
 
     # Streaming
@@ -321,7 +321,7 @@ class ZvukMusicClient:
         :param track_id: Track ID.
         :return: List of Stream objects.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_stream_urls(track_id)
 
     @handle_zvuk_errors(not_found_return=None)
@@ -336,7 +336,7 @@ class ZvukMusicClient:
         :param quality: Quality string — "flac", "high", or "mid".
         :return: Stream URL string, or None if not found.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         url = f"{TINY_API_URL}/track/stream"
         result = await client._request.get(url, params={"quality": quality, "id": track_id})
         if not result:
@@ -354,7 +354,7 @@ class ZvukMusicClient:
 
         :return: Collection object or None.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_collection()
 
     @handle_zvuk_errors(not_found_return=[])
@@ -363,7 +363,7 @@ class ZvukMusicClient:
 
         :return: List of full Track objects.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_liked_tracks()
 
     @handle_zvuk_errors(not_found_return=[])
@@ -372,7 +372,7 @@ class ZvukMusicClient:
 
         :return: List of CollectionItem objects with playlist IDs.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_user_playlists()
 
     @handle_zvuk_errors(not_found_return=[])
@@ -387,7 +387,7 @@ class ZvukMusicClient:
         :param playlist_ids: List of playlist IDs.
         :return: List of SimplePlaylist objects.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.get_short_playlist(list(playlist_ids))
 
     @handle_zvuk_errors(not_found_return=[])
@@ -400,7 +400,7 @@ class ZvukMusicClient:
 
         :return: List of playlist IDs as strings.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         url = f"{TINY_API_URL}/grid/content"
         result = await client._request.get(
             url, params={"name": "editorial_playlist", "ranker_enabled": "true"}
@@ -433,7 +433,7 @@ class ZvukMusicClient:
         :return: Dict with ``lyrics`` (str or None), ``type`` (str or None),
             ``translation`` (str or None), or None on error.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         url = f"{TINY_API_URL}/lyrics"
         result = await client._request.get(url, params={"track_id": track_id})
         if not result or not result.get("lyrics"):
@@ -448,7 +448,7 @@ class ZvukMusicClient:
         :param track_id: Track ID.
         :return: True if successful.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         try:
             return await client.like_track(track_id)
         except (BadRequestError, NetworkError, GraphQLError) as err:
@@ -461,7 +461,7 @@ class ZvukMusicClient:
         :param track_id: Track ID.
         :return: True if successful.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         try:
             return await client.unlike_track(track_id)
         except (BadRequestError, NetworkError, GraphQLError) as err:
@@ -474,7 +474,7 @@ class ZvukMusicClient:
         :param release_id: Release ID.
         :return: True if successful.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         try:
             return await client.like_release(release_id)
         except (BadRequestError, NetworkError, GraphQLError) as err:
@@ -487,7 +487,7 @@ class ZvukMusicClient:
         :param release_id: Release ID.
         :return: True if successful.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         try:
             return await client.unlike_release(release_id)
         except (BadRequestError, NetworkError, GraphQLError) as err:
@@ -500,7 +500,7 @@ class ZvukMusicClient:
         :param artist_id: Artist ID.
         :return: True if successful.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         try:
             return await client.like_artist(artist_id)
         except (BadRequestError, NetworkError, GraphQLError) as err:
@@ -513,7 +513,7 @@ class ZvukMusicClient:
         :param artist_id: Artist ID.
         :return: True if successful.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         try:
             return await client.unlike_artist(artist_id)
         except (BadRequestError, NetworkError, GraphQLError) as err:
@@ -526,7 +526,7 @@ class ZvukMusicClient:
         :param playlist_id: Playlist ID.
         :return: True if successful.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         try:
             return await client.like_playlist(playlist_id)
         except (BadRequestError, NetworkError, GraphQLError) as err:
@@ -539,7 +539,7 @@ class ZvukMusicClient:
         :param playlist_id: Playlist ID.
         :return: True if successful.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         try:
             return await client.unlike_playlist(playlist_id)
         except (BadRequestError, NetworkError, GraphQLError) as err:
@@ -556,7 +556,7 @@ class ZvukMusicClient:
         :param track_ids: Optional list of track IDs to add.
         :return: New playlist ID.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         return await client.create_playlist(name, track_ids=track_ids)
 
     async def delete_playlist(self, playlist_id: str) -> bool:
@@ -565,7 +565,7 @@ class ZvukMusicClient:
         :param playlist_id: Playlist ID.
         :return: True if successful.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         try:
             return await client.delete_playlist(playlist_id)
         except (BadRequestError, NetworkError, GraphQLError) as err:
@@ -579,7 +579,7 @@ class ZvukMusicClient:
         :param track_ids: List of track IDs to add.
         :return: True if successful.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         try:
             return await client.add_tracks_to_playlist(playlist_id, track_ids)
         except (BadRequestError, NetworkError, GraphQLError) as err:
@@ -593,7 +593,7 @@ class ZvukMusicClient:
         :param track_ids: Complete list of track IDs the playlist should contain.
         :return: True if successful.
         """
-        client = self._ensure_connected()
+        client = await self._get_client()
         try:
             return await client.update_playlist(playlist_id, track_ids)
         except (BadRequestError, NetworkError, GraphQLError) as err:
