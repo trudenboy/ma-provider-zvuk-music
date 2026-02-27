@@ -5,39 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 2026-02-22
+<!-- changelog entries will be added here by release workflow -->
 
-- chore: set Russian README as default (#43) (`eee515d`)
-- docs: rewrite README.ru in MSX style with Docker Quick Start, full features, references (`6dcf8cc`)
-- docs: rewrite README in MSX style with Docker Quick Start, full features, references (`b150c28`)
+## [1.7.0] - 2026-02-26
 
-## 2026-02-21
+## What's Changed
+* fix(tests): use cast to avoid type: ignore in test_lyrics by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/61
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/62
+* fix(tests): use music_assistant imports + upstream CI script by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/63
+* fix: address PR #3242 Copilot review comments by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/64
+* fix(parsers): use isinstance check for playlist image src by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/65
+* fix(security,api_client): decouple _request, validate resolve_image domain by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/66
+* test(stream_details): update mocks for _tiny_get in get_direct_stream_url by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/67
+* fix(api_client): use shared http_session instead of per-call aiohttp.ClientSession by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/68
+* fix: remove unused type: ignore[attr-defined] comments in test_stream_details by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/69
+* chore: migrate docs site from MkDocs to Astro Starlight by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/70
+* chore: migrate docs to Astro Starlight + align with Yandex Music format by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/71
+* docs: add dedicated Features section by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/72
+* fix: remove duplicate heading, add Zvuk Music icon to index pages by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/73
+* feat(browse): implement browse method and add RU/EN docs by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/74
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/75
+* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/76
 
-- fix: remove music-assistant-models pin to resolve CI dependency conflict (`c18234c`)
-- docs: unify documentation structure (#9) (`5697588`)
 
-## 2026-02-19
+**Full Changelog**: https://github.com/trudenboy/ma-provider-zvuk-music/compare/v1.6.0...v1.7.0
 
-- feat: initial provider setup (`d40be07`)
+---
 
-
-<!-- Pre-separation: development in trudenboy/ma-server monorepo -->
-<!-- The following changes were developed in the `trudenboy/ma-server` monorepo before this provider was extracted into its own repository on 2026-02-19. -->
-
-## 2026-02-10
-
-- feat: provider accepted into upstream Music Assistant (music-assistant/server#3090)
-
-## 2026-02-03
-
-- chore: update Zvuk Music icons to official 2024 logo
-- test: add Zvuk Music unit tests
-
-## 2026-02-01
-
-- feat: add Zvuk Music provider scaffold (manifest, constants, icons)
-- feat: add Zvuk Music API client and model parsers
-- feat: implement ZvukMusicProvider (browse, search, streaming)
+---
 
 ## [1.6.0] - 2026-02-25
 
@@ -101,29 +96,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.7.0] - 2026-02-26
+## 2026-02-22
 
-## What's Changed
-* fix(tests): use cast to avoid type: ignore in test_lyrics by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/61
-* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/62
-* fix(tests): use music_assistant imports + upstream CI script by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/63
-* fix: address PR #3242 Copilot review comments by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/64
-* fix(parsers): use isinstance check for playlist image src by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/65
-* fix(security,api_client): decouple _request, validate resolve_image domain by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/66
-* test(stream_details): update mocks for _tiny_get in get_direct_stream_url by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/67
-* fix(api_client): use shared http_session instead of per-call aiohttp.ClientSession by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/68
-* fix: remove unused type: ignore[attr-defined] comments in test_stream_details by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/69
-* chore: migrate docs site from MkDocs to Astro Starlight by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/70
-* chore: migrate docs to Astro Starlight + align with Yandex Music format by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/71
-* docs: add dedicated Features section by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/72
-* fix: remove duplicate heading, add Zvuk Music icon to index pages by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/73
-* feat(browse): implement browse method and add RU/EN docs by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/74
-* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/75
-* chore: sync workflow wrappers from ma-provider-tools by @trudenboy in https://github.com/trudenboy/ma-provider-zvuk-music/pull/76
+- chore: set Russian README as default (#43) (`eee515d`)
+- docs: rewrite README.ru in MSX style with Docker Quick Start, full features, references (`6dcf8cc`)
+- docs: rewrite README in MSX style with Docker Quick Start, full features, references (`b150c28`)
+
+## 2026-02-21
+
+- fix: remove music-assistant-models pin to resolve CI dependency conflict (`c18234c`)
+- docs: unify documentation structure (#9) (`5697588`)
+
+## 2026-02-19
+
+- feat: initial provider setup (`d40be07`)
 
 
-**Full Changelog**: https://github.com/trudenboy/ma-provider-zvuk-music/compare/v1.6.0...v1.7.0
+<!-- Pre-separation: development in trudenboy/ma-server monorepo -->
+<!-- The following changes were developed in the `trudenboy/ma-server` monorepo before this provider was extracted into its own repository on 2026-02-19. -->
 
----
+## 2026-02-10
 
-<!-- changelog entries will be added here by release workflow -->
+- feat: provider accepted into upstream Music Assistant (music-assistant/server#3090)
+
+## 2026-02-03
+
+- chore: update Zvuk Music icons to official 2024 logo
+- test: add Zvuk Music unit tests
+
+## 2026-02-01
+
+- feat: add Zvuk Music provider scaffold (manifest, constants, icons)
+- feat: add Zvuk Music API client and model parsers
+- feat: implement ZvukMusicProvider (browse, search, streaming)
