@@ -66,7 +66,7 @@ class ZvukMusicProvider(MusicProvider):
         if not token:
             raise LoginFailed("No Zvuk Music token provided")
 
-        self._client = ZvukMusicClient(str(token), self.mass.http_session)
+        self._client = ZvukMusicClient(str(token))
         await self._client.connect()
         self.logger.info("Successfully connected to Zvuk Music")
 

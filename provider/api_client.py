@@ -4,10 +4,8 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Awaitable, Callable, Sequence
-from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar, cast
+from typing import Any, ParamSpec, TypeVar, cast
 
-if TYPE_CHECKING:
-    import aiohttp
 from music_assistant_models.errors import (
     LoginFailed,
     ProviderUnavailableError,
@@ -89,14 +87,12 @@ def handle_zvuk_errors(
 class ZvukMusicClient:
     """Wrapper around zvuk-music ClientAsync."""
 
-    def __init__(self, token: str, http_session: aiohttp.ClientSession) -> None:
+    def __init__(self, token: str) -> None:
         """Initialize the Zvuk Music client.
 
         :param token: Zvuk Music X-Auth-Token.
-        :param http_session: Shared aiohttp session from MA (``self.mass.http_session``).
         """
         self._token = token
-        self._http_session = http_session
         self._client: ClientAsync | None = None
         self._user_id: str | None = None
         self._throttler = Throttler(rate_limit=5, period=1.0)
