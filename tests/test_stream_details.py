@@ -64,7 +64,7 @@ class TestGetDirectStreamUrl:
     @pytest.mark.asyncio
     async def test_returns_stream_url_for_flac(self) -> None:
         """get_direct_stream_url returns the stream URL from the library response."""
-        client = ZvukMusicClient(token="test", http_session=MagicMock())
+        client = ZvukMusicClient(token="test")
         mock_get = self._mock_request(
             client, {"expire": 0, "stream": "https://cdn.zvuk.com/track.flac?token=abc"}
         )
@@ -77,7 +77,7 @@ class TestGetDirectStreamUrl:
     @pytest.mark.asyncio
     async def test_returns_none_when_stream_missing(self) -> None:
         """get_direct_stream_url returns None when result has no stream key."""
-        client = ZvukMusicClient(token="test", http_session=MagicMock())
+        client = ZvukMusicClient(token="test")
         self._mock_request(client, {})
 
         url = await client.get_direct_stream_url("12345", "flac")
@@ -87,7 +87,7 @@ class TestGetDirectStreamUrl:
     @pytest.mark.asyncio
     async def test_returns_none_when_api_returns_none(self) -> None:
         """get_direct_stream_url returns None when API returns None."""
-        client = ZvukMusicClient(token="test", http_session=MagicMock())
+        client = ZvukMusicClient(token="test")
         self._mock_request(client, None)
 
         url = await client.get_direct_stream_url("12345", "high")
@@ -97,7 +97,7 @@ class TestGetDirectStreamUrl:
     @pytest.mark.asyncio
     async def test_passes_quality_param(self) -> None:
         """get_direct_stream_url passes the quality parameter to the API."""
-        client = ZvukMusicClient(token="test", http_session=MagicMock())
+        client = ZvukMusicClient(token="test")
         mock_get = self._mock_request(client, {"stream": "https://cdn.zvuk.com/track.mp3"})
 
         await client.get_direct_stream_url("99999", "high")

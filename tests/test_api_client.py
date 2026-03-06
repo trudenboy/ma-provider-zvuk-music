@@ -30,8 +30,8 @@ from music_assistant.providers.zvuk_music.api_client import ZvukMusicClient, han
 
 
 def _make_client(token: str = "test-token") -> ZvukMusicClient:  # noqa: S107
-    """Create a ZvukMusicClient with a fake token and mocked http session."""
-    return ZvukMusicClient(token=token, http_session=MagicMock())
+    """Create a ZvukMusicClient with a fake token."""
+    return ZvukMusicClient(token=token)
 
 
 def _make_connected_client() -> tuple[ZvukMusicClient, MagicMock]:
