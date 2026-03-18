@@ -12,8 +12,10 @@ from music_assistant_models.errors import (
     ResourceTemporarilyUnavailable,
 )
 from zvuk_music import Artist as ZvukArtist
-from zvuk_music import ClientAsync, Collection
+from zvuk_music import ClientAsync, Collection, StreamQuality
 from zvuk_music import CollectionItem as ZvukCollectionItem
+from zvuk_music import DirectStream as ZvukDirectStream
+from zvuk_music import Lyrics as ZvukLyrics
 from zvuk_music import Playlist as ZvukPlaylist
 from zvuk_music import Release as ZvukRelease
 from zvuk_music import Search as ZvukSearch
@@ -30,7 +32,6 @@ from zvuk_music.exceptions import (
     TimedOutError,
     UnauthorizedError,
 )
-from zvuk_music.utils.request_async import TINY_API_URL
 
 from music_assistant.helpers.throttle_retry import Throttler
 
@@ -134,13 +135,6 @@ class ZvukMusicClient:
         if self._client is None:
             raise ProviderUnavailableError("Client not connected, call connect() first")
         return self._client
-
-    def _is_rate_limit_error(self, err: Exception) -> bool:
-        """Return True if the exception indicates a rate-limit response from Zvuk."""
-        if not isinstance(err, NetworkError):
-            return False
-        msg = str(err).lower()
-        return "429" in msg or "too many requests" in msg or "rate limit" in msg
 
     async def _get_client(self) -> ClientAsync:
         """Acquire a throttle slot then return the connected client."""
@@ -322,25 +316,17 @@ class ZvukMusicClient:
 
     @handle_zvuk_errors(not_found_return=None)
     async def get_direct_stream_url(self, track_id: str, quality: str) -> str | None:
-        """Get a direct (non-DRM) stream URL for a track via /api/tiny/track/stream.
-
-        Uses the zvuk_music library's own request infrastructure (with proper browser headers
-        and auth) instead of the shared MA http session. The library's Request.get() already
-        handles the {"result": {...}} wrapping, so the returned dict is the inner result.
+        """Get a direct (non-DRM) stream URL for a track.
 
         :param track_id: Track ID.
         :param quality: Quality string — "flac", "high", or "mid".
         :return: Stream URL string, or None if not found.
         """
         client = await self._get_client()
-        url = f"{TINY_API_URL}/track/stream"
-        result = await client._request.get(url, params={"quality": quality, "id": track_id})
-        if not result:
-            return None
-        stream = result.get("stream")
-        if not stream:
-            return None
-        return str(stream)
+        result: ZvukDirectStream | None = await client.get_direct_stream_url(
+            track_id, StreamQuality(quality)
+        )
+        return result.stream or None if result else None
 
     # Collection (Library)
 
@@ -391,50 +377,24 @@ class ZvukMusicClient:
         """Get editorial (curated) playlist IDs from Zvuk's grid content API.
 
         Fetches «Подборки» — genre-focused curated playlists shown on the home page.
-        Uses the library's request infrastructure (proper browser headers + auto-unwraps
-        the outer {"result": {...}} wrapper), so the returned dict is the inner result.
 
         :return: List of playlist IDs as strings.
         """
         client = await self._get_client()
-        url = f"{TINY_API_URL}/grid/content"
-        result = await client._request.get(
-            url, params={"name": "editorial_playlist", "ranker_enabled": "true"}
-        )
-        if not result:
-            return []
-        # Library unwraps {"result": {...}}, so result is already the inner dict.
-        # Inner structure: {'page': {'data': [{'type': 'playlist', 'id': 123}, ...]}, ...}
-        data = result.get("page", {}).get("data", [])
-        playlist_ids: list[str] = []
-        for item in data:
-            if item.get("type") != "playlist":
-                continue
-            raw_id = item.get("id")
-            if raw_id is not None:
-                playlist_ids.append(str(raw_id))
-        return playlist_ids
+        return await client.get_editorial_playlist_ids()
 
     @handle_zvuk_errors(not_found_return=None)
-    async def get_lyrics(self, track_id: str) -> dict[str, str | None] | None:
+    async def get_lyrics(self, track_id: str) -> ZvukLyrics | None:
         """Get lyrics for a track from Zvuk lyrics API.
 
-        Fetches lyrics from ``/api/tiny/lyrics?track_id={id}``.
-        Returns synced LRC text (type ``'subtitle'``) or plain text (type ``'lyrics'``).
+        Returns synced LRC text (``is_synced=True``) or plain text.
         Returns ``None`` if the track has no lyrics.
-        Uses the library's request infrastructure (proper browser headers + auto-unwraps
-        the outer {"result": {...}} wrapper).
 
         :param track_id: Track ID.
-        :return: Dict with ``lyrics`` (str or None), ``type`` (str or None),
-            ``translation`` (str or None), or None on error.
+        :return: Lyrics object or None.
         """
         client = await self._get_client()
-        url = f"{TINY_API_URL}/lyrics"
-        result = await client._request.get(url, params={"track_id": track_id})
-        if not result or not result.get("lyrics"):
-            return None
-        return result
+        return await client.get_lyrics(track_id)
 
     # Library modifications
 

@@ -1177,7 +1177,7 @@ wheels = [
 
 [[package]]
 name = "ma-provider-zvuk-music"
-version = "1.0.0"
+version = "1.8.0"
 source = { editable = "." }
 
 [package.optional-dependencies]
@@ -1217,7 +1217,7 @@ requires-dist = [
     { name = "python-dotenv", marker = "extra == 'e2e'", specifier = ">=1.0.0" },
     { name = "ruff", marker = "extra == 'test'", specifier = "==0.14.13" },
     { name = "syrupy", marker = "extra == 'test'", specifier = "==5.0.0" },
-    { name = "zvuk-music", extras = ["async"], marker = "extra == 'test'", specifier = "==0.5.3" },
+    { name = "zvuk-music", extras = ["async"], marker = "extra == 'test'", specifier = "==0.6.1" },
 ]
 provides-extras = ["e2e", "test"]
 
@@ -2746,15 +2746,15 @@ wheels = [
 
 [[package]]
 name = "zvuk-music"
-version = "0.5.3"
+version = "0.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "requests" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0b/10/c2c87eeff97c4788880bcfba73af6d98bd52c2742a1627e6e16b6fc6fbcc/zvuk_music-0.5.3.tar.gz", hash = "sha256:30223cc3e1031389245e86ab939ae4567f4ba33f73d34a18aaadc9f78ba46a66", size = 45833, upload-time = "2026-01-31T13:59:53.961Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/5c/d7c5107a68fb40ddd94f3988c402c31359cea52db5d4de5bd6e8208264b5/zvuk_music-0.6.1.tar.gz", hash = "sha256:9f5e1d78305a6d2388d1f2b2c5ecd16d9e443cacb912770e3d2e0f69215809b6", size = 49624, upload-time = "2026-03-18T11:54:52.698Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6e/13/5298c367ca3ebc72286628b896100e4e26cdccf2928a0fd8177a1e7c9832/zvuk_music-0.5.3-py3-none-any.whl", hash = "sha256:56164284781e580a8a4914d866bc433d0bf00bcedffb55552ac849ad8eefd26d", size = 74338, upload-time = "2026-01-31T13:59:52.365Z" },
+    { url = "https://files.pythonhosted.org/packages/c1/4c/2e5d8ac05ca3423b33e36f61e758649fcdd2835b0746418aed9b90e227c2/zvuk_music-0.6.1-py3-none-any.whl", hash = "sha256:005f968a2bb17a7c3ccd4acd16c151c0d0d1b1b07cbd867acd5934b5d456d698", size = 80150, upload-time = "2026-03-18T11:54:51.068Z" },
 ]
 
 [package.optional-dependencies]

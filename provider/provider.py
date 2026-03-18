@@ -545,19 +545,14 @@ class ZvukMusicProvider(MusicProvider):
                 "Unexpected error while fetching lyrics for track %s: %s", track_id, err
             )
             return None
-        if not result:
-            return None
-
-        lyrics_text: str = result.get("lyrics") or ""
-        lyrics_type: str = result.get("type") or ""
-        if not lyrics_text:
+        if not result or not result.lyrics:
             return None
 
         metadata = MediaItemMetadata()
-        if lyrics_type == "subtitle":
-            metadata.lrc_lyrics = lyrics_text
+        if result.is_synced:
+            metadata.lrc_lyrics = result.lyrics
         else:
-            metadata.lyrics = lyrics_text
+            metadata.lyrics = result.lyrics
         return metadata
 
     async def resolve_image(self, path: str) -> str | bytes:

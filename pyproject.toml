@@ -1,6 +1,6 @@
 [project]
 name = "ma-provider-zvuk-music"
-version = "1.0.0"
+version = "1.8.0"
 description = "Zvuk Music provider for Music Assistant"
 requires-python = ">=3.12"
 dependencies = []
@@ -19,7 +19,7 @@ test = [
   "syrupy==5.0.0",
   "codespell==2.4.1",
   "music-assistant @ git+https://github.com/music-assistant/server.git@dev",
-  "zvuk-music[async]==0.5.3",
+  "zvuk-music[async]==0.6.1",
   "ruff==0.14.13",
   "mypy==1.19.1",
   "pre-commit==4.5.1",
