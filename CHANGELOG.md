@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.1] - 2026-03-18
+
+- fix: add zvuk-music[async]==0.6.1 to project dependencies for CI (`c2f6137`)
+- feat: upgrade zvuk-music to 0.6.1, replace private _request access (`8560fae`)
+- test: remove http_session from ZvukMusicClient instantiation in tests (`13a6b31`)
+- fix: remove unused http_session parameter from ZvukMusicClient (`848cfc9`)
+- fix: make create_playlist media_types optional for base class compatibility (`201fcc6`)
+- fix: match create_playlist signature with updated MusicProvider base class (`a616d90`)
+- test: update library playlist test to reflect new synthesis-always-yielded behavior (`2a121fb`)
+- fix: address PR review comments on library playlists and lyrics error handling (`31ed17a`)
+- chore: sync workflow wrappers from ma-provider-tools (#78) (`d689eb5`)
+- chore: reformat CHANGELOG — use commit history instead of PR notes [skip ci] (`ad640cd`)
+- chore: reformat CHANGELOG — marker to top, releases newest-first [skip ci] (`26fc3b8`)
+- chore: reformat CHANGELOG — marker to top, releases newest-first [skip ci] (`c9c6250`)
+- fix: let ResourceTemporarilyUnavailable propagate from quality chain in get_stream_details (`fa96f66`)
+- chore: update changelog for v1.7.0 [skip ci] (`cee247b`)
+
+---
+
 <!-- changelog entries will be added here by release workflow -->
 
 ## [1.7.0] - 2026-02-26
