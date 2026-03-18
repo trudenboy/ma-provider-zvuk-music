@@ -3,7 +3,7 @@ name = "ma-provider-zvuk-music"
 version = "1.8.0"
 description = "Zvuk Music provider for Music Assistant"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["zvuk-music[async]==0.6.1"]
 
 [project.optional-dependencies]
 e2e = [

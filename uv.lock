@@ -1179,6 +1179,9 @@ wheels = [
 name = "ma-provider-zvuk-music"
 version = "1.8.0"
 source = { editable = "." }
+dependencies = [
+    { name = "zvuk-music", extra = ["async"] },
+]
 
 [package.optional-dependencies]
 e2e = [
@@ -1217,6 +1220,7 @@ requires-dist = [
     { name = "python-dotenv", marker = "extra == 'e2e'", specifier = ">=1.0.0" },
     { name = "ruff", marker = "extra == 'test'", specifier = "==0.14.13" },
     { name = "syrupy", marker = "extra == 'test'", specifier = "==5.0.0" },
+    { name = "zvuk-music", extras = ["async"], specifier = "==0.6.1" },
     { name = "zvuk-music", extras = ["async"], marker = "extra == 'test'", specifier = "==0.6.1" },
 ]
 provides-extras = ["e2e", "test"]
