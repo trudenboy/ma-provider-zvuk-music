@@ -8,9 +8,8 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from music_assistant_models.enums import ProviderFeature
 from music_assistant_models.media_items import BrowseFolder, Playlist, RecommendationFolder
-
-from music_assistant.providers.zvuk_music.constants import PLAYLIST_TRACK_FETCH_LIMIT
-from music_assistant.providers.zvuk_music.provider import ZvukMusicProvider
+from provider.constants import PLAYLIST_TRACK_FETCH_LIMIT
+from provider.provider import ZvukMusicProvider
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -133,7 +132,7 @@ class TestRecommendations:
 
     @pytest.mark.asyncio
     async def test_omits_for_you_folder_when_helper_returns_empty(self) -> None:
-        """The «Плейлисты для вас» folder is omitted when _get_for_you_playlists returns []."""
+        """The "Made for you" folder is omitted when _get_for_you_playlists returns []."""
         provider = _make_provider()
         provider._get_for_you_playlists = AsyncMock(return_value=[])
         provider._get_editorial_playlists = AsyncMock(return_value=[_make_playlist("99")])
@@ -145,7 +144,7 @@ class TestRecommendations:
 
     @pytest.mark.asyncio
     async def test_omits_editorial_folder_when_helper_returns_empty(self) -> None:
-        """The «Подборки» folder is omitted when _get_editorial_playlists returns []."""
+        """The "Collections" folder is omitted when _get_editorial_playlists returns []."""
         provider = _make_provider()
         provider._get_for_you_playlists = AsyncMock(return_value=[_make_playlist("3")])
         provider._get_editorial_playlists = AsyncMock(return_value=[])

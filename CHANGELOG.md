@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.3] - 2026-07-16
+
+- feat: reverse-port the unported upstream mass-migrations (May 22 – Jun 19, pre-dating the reverse-sync radar): browse/recommendation labels localized via server translations (upstream #4280, superseding the translation keys added in 1.8.2), common-string references (upstream #4327), the unofficial-integration disclaimer entry (upstream #4164), and the stable-stage manifest promotion. Provider tree now matches upstream's inlined copy modulo method order.
+
 ## [1.8.2] - 2026-07-16
 
 - refactor(config): move `ConfigEntry` labels/descriptions and static `ConfigValueOption` titles into `provider/strings.json` (upstream `check_config_entries` compliance); `ConfigValueOption` calls are now value-only.
