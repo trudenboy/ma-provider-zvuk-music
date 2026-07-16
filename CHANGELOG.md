@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+- refactor(config): move `ConfigEntry` labels/descriptions and static `ConfigValueOption` titles into `provider/strings.json` (upstream `check_config_entries` compliance); `ConfigValueOption` calls are now value-only.
+- refactor(browse): add `translation_key` to the «Плейлисты для вас» / «Подборки» recommendation and browse folders, with labels authored in `provider/strings.json` (upstream `check_translatable_labels` compliance).
+- style: ruff 0.15 safe autofixes matching the upstream dev lint rules.
+
 ## [1.8.1] - 2026-03-18
 
 - fix: add zvuk-music[async]==0.6.1 to project dependencies for CI (`c2f6137`)
