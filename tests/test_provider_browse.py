@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from music_assistant_models.enums import ProviderFeature
 from music_assistant_models.media_items import BrowseFolder, Playlist, RecommendationFolder
+
 from provider.constants import PLAYLIST_TRACK_FETCH_LIMIT
 from provider.provider import ZvukMusicProvider
 
