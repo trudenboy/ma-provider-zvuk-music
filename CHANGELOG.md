@@ -192,3 +192,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - feat: add Zvuk Music provider scaffold (manifest, constants, icons)
 - feat: add Zvuk Music API client and model parsers
 - feat: implement ZvukMusicProvider (browse, search, streaming)
+- Reverse-synced upstream PR #5058 (WIP)
