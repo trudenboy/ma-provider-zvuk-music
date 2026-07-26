@@ -60,9 +60,27 @@ class ZvukMusicProvider(MusicProvider):
             raise ProviderUnavailableError("Provider not initialized")
         return self._client
 
+<<<<<<< ours
+=======
+    async def get_config_entries(self) -> tuple[ConfigEntry, ...]:
+        """Return Config entries to configure this provider."""
+        return (
+            CONF_ENTRY_UNOFFICIAL_PROVIDER,
+            ConfigEntry(
+                key=CONF_QUALITY,
+                type=ConfigEntryType.STRING,
+                options=[
+                    ConfigValueOption(QUALITY_HIGH),
+                    ConfigValueOption(QUALITY_LOSSLESS),
+                ],
+                default_value=QUALITY_HIGH,
+            ),
+        )
+
+>>>>>>> theirs
     async def handle_async_init(self) -> None:
         """Handle async initialization of the provider."""
-        token = self.config.get_value(CONF_TOKEN)
+        token = self.get_setup_value(CONF_TOKEN)
         if not token:
             raise LoginFailed("No Zvuk Music token provided")
 
@@ -555,7 +573,7 @@ class ZvukMusicProvider(MusicProvider):
             ),
         }
         if is_zvuk:
-            token = self.config.get_value(CONF_TOKEN)
+            token = self.get_setup_value(CONF_TOKEN)
             if not token:
                 return str(path)
             headers["X-Auth-Token"] = str(token)
