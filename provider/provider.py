@@ -71,7 +71,7 @@ class ZvukMusicProvider(MusicProvider):
         return self._client
 
     async def get_config_entries(self) -> tuple[ConfigEntry, ...]:
-        """Return config entries for provider options."""
+        """Return Config entries to configure this provider."""
         return (
             CONF_ENTRY_UNOFFICIAL_PROVIDER,
             ConfigEntry(
@@ -123,6 +123,8 @@ class ZvukMusicProvider(MusicProvider):
             provider=self.instance_id,
             name=name,
         )
+
+    # Search
 
     @use_cache(3600 * 24 * 14)
     async def search(
@@ -183,6 +185,8 @@ class ZvukMusicProvider(MusicProvider):
 
         return result
 
+    # Get single items
+
     @use_cache(3600 * 24 * 30)
     async def get_artist(self, prov_artist_id: str) -> Artist:
         """
@@ -238,6 +242,8 @@ class ZvukMusicProvider(MusicProvider):
         if not playlist:
             raise MediaNotFoundError(f"Playlist {prov_playlist_id} not found")
         return parse_playlist(self, playlist)
+
+    # Get related items
 
     @use_cache(3600 * 24 * 30, allow_expired_cache=True)
     async def get_album_tracks(self, prov_album_id: str) -> list[Track]:
@@ -373,6 +379,8 @@ class ZvukMusicProvider(MusicProvider):
 
         return result[:limit]
 
+    # Library methods
+
     async def get_library_artists(self) -> AsyncGenerator[Artist]:
         """Retrieve library artists from Zvuk Music."""
         collection = await self.client.get_collection()
@@ -427,10 +435,11 @@ class ZvukMusicProvider(MusicProvider):
 
     async def get_recommendations(self) -> list[RecommendationFolder]:
         """
-        Return the available recommendation rows without loading their items.
+        Return the available recommendation rows, without items.
 
-        The items for each row are fetched separately by
-        ``get_recommendation_items``.
+        Two rows:
+        - "for_you" ("Made for you"): Zvuk's AI-generated personalized playlists.
+        - "editorial" ("Collections"): Editorial genre-themed curated playlists.
         """
         return [
             RecommendationFolder(
@@ -454,9 +463,9 @@ class ZvukMusicProvider(MusicProvider):
         self, item_id: str
     ) -> UniqueList[MediaItemType | ItemMapping | BrowseFolder]:
         """
-        Return the items for one recommendation row.
+        Return the items for a single recommendation row.
 
-        :param item_id: The row ID returned by ``get_recommendations``.
+        :param item_id: The item_id of the row, as returned by get_recommendations.
         """
         if item_id == "for_you":
             return UniqueList(await self._get_for_you_playlists())
@@ -592,6 +601,8 @@ class ZvukMusicProvider(MusicProvider):
             self.logger.debug("Failed to resolve image %s: %s", path, err)
         return str(path)
 
+    # Library edit methods
+
     async def library_add(self, item: MediaItemType) -> bool:
         """
         Add item to library.
@@ -630,6 +641,8 @@ class ZvukMusicProvider(MusicProvider):
         if media_type == MediaType.PLAYLIST:
             return await self.client.unlike_playlist(prov_item_id)
         return False
+
+    # Playlist management
 
     async def create_playlist(self, name: str, media_types: set[MediaType]) -> Playlist:
         """
@@ -672,6 +685,8 @@ class ZvukMusicProvider(MusicProvider):
             str(t.id) for i, t in enumerate(simple_tracks) if t.id and i not in remove_positions
         ]
         await self.client.update_playlist(prov_playlist_id, remaining_ids)
+
+    # Streaming
 
     async def get_stream_details(
         self, item_id: str, media_type: MediaType = MediaType.TRACK

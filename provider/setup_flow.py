@@ -24,7 +24,7 @@ _ENTRIES = (
 
 async def run_setup(session: SetupSession) -> None:
     """
-    Run the setup flow and persist the submitted Zvuk token.
+    Run the setup flow: collect the Zvuk auth token and create the provider.
 
     :param session: The setup session driving the flow.
     """
