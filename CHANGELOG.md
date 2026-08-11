@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.4] - 2026-08-11
+
+### Added
+
+- Added a guided setup step that collects the required Zvuk X-Auth-Token before connecting the provider.
+
+### Changed
+
+- Recommendation rows now load their playlists only when Music Assistant requests that row.
+
+### Fixed
+
+- New provider instances can be configured through the current Music Assistant setup flow, and rejected tokens now show a Zvuk-specific sign-in message.
+
 ## [1.8.3] - 2026-07-16
 
 - feat: reverse-port the unported upstream mass-migrations (May 22 – Jun 19, pre-dating the reverse-sync radar): browse/recommendation labels localized via server translations (upstream #4280, superseding the translation keys added in 1.8.2), common-string references (upstream #4327), the unofficial-integration disclaimer entry (upstream #4164), and the stable-stage manifest promotion. Provider tree now matches upstream's inlined copy modulo method order.
