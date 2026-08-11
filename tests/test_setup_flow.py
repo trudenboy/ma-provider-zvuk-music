@@ -174,7 +174,8 @@ async def test_image_resolution_uses_setup_token() -> None:
 
 def test_strings_define_setup_flow_and_token_specific_login_error() -> None:
     """Provider strings describe setup and name the rejected token."""
-    strings = json.loads(Path("provider/strings.json").read_text())
+    strings_path = Path(__file__).resolve().parents[1] / "provider" / "strings.json"
+    strings = json.loads(strings_path.read_text())
 
     assert strings["setup_flow"]["user"]["title"] == "Connect to Zvuk"
     assert "X-Auth-Token" in strings["errors"]["login_failed"]
