@@ -11,8 +11,8 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from music_assistant_models.enums import ConfigEntryType
 
+from music_assistant.controllers.config.migrations import migrate_provider_setup_data
 from music_assistant.models.music_provider import MusicProvider
-from music_assistant.models.provider import Provider
 from music_assistant.models.setup_flow import SetupFlowError
 from provider.constants import CONF_QUALITY, CONF_TOKEN
 from provider.provider import ZvukMusicProvider
@@ -116,15 +116,27 @@ async def test_provider_initialization_uses_setup_token() -> None:
 
 
 @pytest.mark.asyncio
-async def test_provider_initialization_falls_back_to_legacy_config_token() -> None:
-    """Existing installations keep using a token stored in provider config."""
+async def test_provider_initialization_uses_migrated_legacy_token() -> None:
+    """Existing installations migrate their config token into setup data."""
+    instance_id = "zvuk_music--legacy"
+    settings = {
+        "providers": {
+            instance_id: {
+                "domain": "zvuk_music",
+                "values": {CONF_TOKEN: "legacy-token"},
+            }
+        }
+    }
+    assert migrate_provider_setup_data(settings, lambda value: f"encrypted:{value}")
+    migrated_config = settings["providers"][instance_id]
+    assert migrated_config["values"] == {}
+    assert migrated_config["setup_data"] == {CONF_TOKEN: "encrypted:legacy-token"}
+
     provider = Mock(spec=ZvukMusicProvider)
+    provider.instance_id = instance_id
     provider.mass = Mock()
-    provider.mass.config.get.return_value = {}
-    provider.config = Mock()
-    provider.config.values = {}
-    provider.config.get_value.return_value = "legacy-token"
-    provider.get_config_value = Provider.get_config_value.__get__(provider, ZvukMusicProvider)
+    provider.mass.config.get.return_value = migrated_config["setup_data"]
+    provider.mass.config.decrypt_string.return_value = "legacy-token"
     provider.get_setup_value = MusicProvider.get_setup_value.__get__(provider, ZvukMusicProvider)
     provider.logger = Mock()
     provider.handle_async_init = ZvukMusicProvider.handle_async_init.__get__(
@@ -137,7 +149,7 @@ async def test_provider_initialization_falls_back_to_legacy_config_token() -> No
         await provider.handle_async_init()
 
     provider.mass.config.get.assert_called_once()
-    provider.config.get_value.assert_called_once_with(CONF_TOKEN, None)
+    provider.mass.config.decrypt_string.assert_called_once_with("encrypted:legacy-token")
     client_cls.assert_called_once_with("legacy-token")
     client.connect.assert_awaited_once()
 
