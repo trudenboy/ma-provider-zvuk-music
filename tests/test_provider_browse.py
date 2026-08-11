@@ -1,4 +1,4 @@
-"""Tests for ZvukMusicProvider browse, recommendations, and playlist management."""
+"""Tests for ZvukMusicProvider browse and playlist management."""
 
 from __future__ import annotations
 

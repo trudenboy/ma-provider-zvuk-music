@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - New provider instances can be configured through the current Music Assistant setup flow, and rejected tokens now show a Zvuk-specific sign-in message.
+- Upstream synchronization no longer misclassifies the already reverse-ported setup-flow and recommendation changes as unmerged upstream work.
 
 ## [1.8.3] - 2026-07-16
 
