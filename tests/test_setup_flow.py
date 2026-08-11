@@ -5,14 +5,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, Self
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from music_assistant_models.enums import ConfigEntryType
 
 from music_assistant.models.setup_flow import SetupFlowError
-
 from provider.constants import CONF_QUALITY, CONF_TOKEN
 from provider.provider import ZvukMusicProvider
 from provider.setup_flow import run_setup
@@ -36,7 +35,7 @@ class _ImageResponse:
         """Return deterministic image content."""
         return b"image"
 
-    async def __aenter__(self) -> _ImageResponse:
+    async def __aenter__(self) -> Self:
         """Enter the response context."""
         return self
 
