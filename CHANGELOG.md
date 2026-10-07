@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.7] - 2026-10-07
+
+### Changed
+
+- Require `zvuk-music[async]==0.6.2`.
+- MP3 streams are now requested through Zvuk's GraphQL API; FLAC is attempted first only when lossless quality is selected.
+
+### Fixed
+
+- Setting up the provider with a valid token no longer fails with "This resource temporarily unavailable" while Zvuk's anti-bot protection blocks its profile endpoint.
+- Playback works again while the anti-bot protection blocks direct stream links: tracks fall back to MP3 320 or 128.
+- Playlists from your Zvuk collection stay editable when Zvuk does not expose your profile.
+- The "Collections" recommendation row shows up empty instead of failing when Zvuk blocks it, and blocked requests no longer dump the full HTML error page into the log.
+
 ## [1.8.6] - 2026-10-07
 
 ### Fixed
