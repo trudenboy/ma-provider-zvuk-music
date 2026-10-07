@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.9] - 2026-10-07
+
+### Fixed
+
+- Playlists you follow are no longer shown as editable when Zvuk does not expose your profile; without a known profile all playlists stay read-only.
+
 ## [1.8.8] - 2026-10-07
 
 ### Changed
