@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.8] - 2026-10-07
+
+### Changed
+
+- Require `zvuk-music[async]==0.6.3`.
+- All stream qualities are now resolved with a single request to Zvuk's GraphQL API.
+
+### Fixed
+
+- Lossless quality plays FLAC again (16- or 24-bit), with MP3 320/128 as fallback for tracks without FLAC.
+- Removing tracks from a Zvuk playlist removes the selected tracks instead of failing, and no longer makes the playlist private.
+- Playlist tracks now report their position, so removal targets the right track on every page.
+- Connecting no longer requests the Zvuk profile twice.
+
 ## [1.8.7] - 2026-10-07
 
 ### Changed
