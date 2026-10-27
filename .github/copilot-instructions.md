@@ -1,61 +1,85 @@
-# Copilot Instructions
+<!-- ma-provider-tools: rendered from wrappers/.github/copilot-instructions.md.j2 -->
+# Copilot Instructions — Zvuk Music
 
-This is a **Music Assistant (MA) music provider** for the [Zvuk Music](https://zvuk.com/) streaming service (Russian). It bridges the unofficial `zvuk-music` Python client to the MA plugin interface.
+This repo is the source of truth for the **Zvuk Music** Music Assistant
+provider, which is later inlined upstream into
+`music-assistant/server/music_assistant/providers/zvuk_music/`. Review it by
+the upstream standards below (mirrored verbatim from upstream by
+`ma-provider-tools`; do not edit), with these provider-repo exceptions:
 
-## Build & Test
+- **Paths.** Upstream `music_assistant/providers/zvuk_music/` is
+  `provider/` here, and `tests/providers/zvuk_music/` is `tests/`.
+  `music_assistant/helpers/` and the demo providers come from the installed
+  `music-assistant` package.
+- **Project standards** are in `AGENTS.md` (`CLAUDE.md` is a symlink to it),
+  with provider specifics in `CLAUDE.local.md`. Deviations are at least
+  `[PROBLEM]`.
+- **PR title.** Provider-repo PRs **use** Conventional Commit prefixes
+  (`feat:`, `fix:`, …). Do not flag them. Only PRs in `music-assistant/server`
+  must not have one.
+- **PR description.** Provider-repo PRs follow this repo's
+  `.github/PULL_REQUEST_TEMPLATE.md`. The upstream PR-description rules apply
+  only to text drafted for an upstream PR body.
+- **Settled by CI.** In addition to lint and tests, `check-upstream-rules`
+  (`MA001`–`MA006`), the method-order hook and upstream's own repo checks
+  (blocking IO, icons, manifests) already run. Do not repeat their findings;
+  only question a `# ma-allow:` reason that does not hold up.
+- **Mirrored files.** `.github/instructions/*`, `.claude/skills/*`,
+  `scripts/check_*.py`, `ruff.toml` and the sync-managed workflows are
+  distributed from `ma-provider-tools`. Changes to them belong there, not in
+  this repo.
 
-```bash
-# Install dependencies (requires uv, Python 3.12+)
-./scripts/setup.sh
+## PR Review Standards
 
-# Run unit tests (fast, no MA server)
-pytest tests/ -m "not integration"
+### Philosophy
 
-# Run a single test file or test
-pytest tests/test_parsers.py
-pytest tests/test_parsers.py::TestParseArtist::test_parse_artist_basic
+Comment only where you're confident there's a real issue — if you're uncertain whether something is a problem, don't raise it. Actionable feedback, not observations. One sentence where one sentence does the job. On documentation or user-facing text, flag wording only when it's genuinely confusing or could mislead someone into an error.
 
-# Full suite with coverage
-pytest --cov=provider --cov-report=html tests/
+### What to review
 
-# Lint + type check + format (all-in-one)
-pre-commit run --all-files
-```
+Correctness and bugs, blocking IO in async code, security, performance, test coverage, docs the change makes wrong, and consistency with the surrounding code. `AGENTS.md` holds the project standards — deviations from it are at least `[PROBLEM]`.
 
-## Architecture
+### Linked issues
 
-The provider follows the MA plugin pattern with three layers:
+If the PR references an issue, read it before reviewing the diff. Then judge two things: whether the change actually resolves the reported problem, and whether it does so in the most elegant way available. A fix that works but patches a symptom, sits at the wrong layer, or adds a special case where the existing design already had a seam for it is a `[PROBLEM]` — say which approach would be cleaner and why. A change that leaves part of the issue unaddressed, or addresses something else entirely, is `[CRITICAL]`.
 
-| File | Role |
-|------|------|
-| `provider/__init__.py` | Entry point: `setup()`, `get_config_entries()`, declares `SUPPORTED_FEATURES` |
-| `provider/provider.py` | `ZvukMusicProvider(MusicProvider)` — implements the MA interface (get_library_*, search, streaming) |
-| `provider/api_client.py` | `ZvukMusicClient` — wraps `zvuk_music.ClientAsync`, maps Zvuk exceptions to MA errors |
-| `provider/parsers.py` | Pure functions: convert Zvuk API objects → MA model objects |
-| `provider/manifest.json` | Plugin metadata consumed by MA (`domain: zvuk_music`) |
+### Reuse over reimplementation
 
-**Data flow**: MA calls `ZvukMusicProvider` → `ZvukMusicClient` → `zvuk_music.ClientAsync` → Zvuk API → responses parsed by `parsers.py` into MA models.
+Check whether `music_assistant/helpers/` already covers what new code does; providers are expected to use the shared helpers rather than reimplement. A music provider parsing PLS itself instead of calling `parse_pls` from `music_assistant.helpers.playlists` is a `[PROBLEM]`.
 
-**Zvuk API terminology**: Zvuk uses "release" for albums — always call `client.get_release()` / `client.get_releases()`, never "album". The `parse_album()` parser handles the translation.
+### New providers
 
-## Key Conventions
+When the PR adds files under `music_assistant/providers/`, the matching demo provider is the ground truth — it's the annotated template that encodes the required structure, lifecycle and config schema:
 
-**Error handling**: All `ZvukMusicClient` methods are decorated with `@handle_zvuk_errors(not_found_return=...)`. This maps Zvuk exceptions to MA exceptions (`LoginFailed`, `ResourceTemporarilyUnavailable`, etc.). Library mutation methods (like/unlike) catch errors and return `False` instead of raising.
+| Provider type | Reference |
+|---|---|
+| Music source | `music_assistant/providers/_demo_music_provider` |
+| Player | `music_assistant/providers/_demo_player_provider` |
+| Plugin | `music_assistant/providers/_demo_plugin_provider` |
+| Audio analysis | `music_assistant/providers/_demo_audio_analysis_provider` |
 
-**Caching**: Use `@use_cache(seconds)` decorator from `music_assistant.controllers.cache` on provider methods that fetch remote data. Library generators (`get_library_*`) are intentionally not cached — they're called during sync.
+Read the demo provider alongside the new one, then flag deviations from its requirements and patterns as `[PROBLEM]` or `[CRITICAL]` depending on what breaks. Provider icons (`icon.svg`) are capped at 5KB — anything larger is `[CRITICAL]`.
 
-**Batch fetching**: The Zvuk API returns only IDs from collection/library endpoints. The provider pattern is: fetch IDs → chunk into `DEFAULT_LIMIT` (50) batches → fetch full objects. See `get_library_artists()` for the canonical example.
+### Don't duplicate CI
 
-**Playlist track removal**: The Zvuk API has no "remove by ID" operation. `remove_playlist_tracks()` fetches all tracks, filters out the positions to remove, and calls `update_playlist()` with the remaining IDs.
+Reviews are requested only once `lint` and `test` have passed on the commit under review, so formatting, lint, test failures and missing dependencies are already settled — don't flag them. `.pre-commit-config.yaml` and `.github/workflows/test.yml` are the authority on that class of problem. Spend the review on what CI can't see.
 
-**Simple vs Full objects**: Zvuk has `SimpleTrack`/`SimpleArtist`/`SimpleRelease`/`SimplePlaylist` types with fewer fields. Parsers accept both via union types (`ZvukTrack | ZvukSimpleTrack`). Use `hasattr()` to check for fields only on full objects (e.g. `position`, `genres`, `user_id`).
+### PR title
 
-**Streaming quality fallback**: `get_stream_details()` tries FLAC → HIGH (320kbps) → MID (128kbps) when lossless is requested; HIGH → MID when high quality is requested. Falls back to `stream.get_best_available()` as a last resort.
+A functional description of the change, with no conventional-commit prefix (`feat:`, `fix:`, `refactor:`, `chore:`, ...) — labels do the categorizing. A prefixed title is a `[PROBLEM]`.
 
-**Test mocking**: Tests use `Mock()` objects with explicit attribute deletion (`del mock.attr`) to simulate fields absent on Simple* types. See `_create_mock_release()` with `del release.genres` in `tests/test_parsers.py`.
+### Existing review comments
 
-**Commit format**: Conventional Commits (`feat:`, `fix:`, `chore:`, `test:`) — used for auto-generating CHANGELOG.
+Flag earlier review comments on the PR that haven't been addressed.
 
-**Branch naming**: `feature/<kebab-case>`, `fix/<kebab-case>`, `chore/<kebab-case>`. PRs target `dev` branch; `dev` → `main` for releases.
+### Severity
 
-**Line length**: 100 characters (ruff). All public functions require PEP 257 docstrings.
+- `[CRITICAL]` — must fix before merge: bugs, security issues, broken functionality
+- `[PROBLEM]` — should fix: bad patterns, missing tests, standards deviations
+- `[SUGGESTION]` — optional: minor refactors, nice-to-haves
+
+### Output
+
+Post an inline comment on GitHub for every `[CRITICAL]` and `[PROBLEM]`. Do not post `[SUGGESTION]` items, and don't comment on what's already fine.
+
+Each comment carries its severity, states the problem in a sentence, says why it matters when that isn't self-evident, and gives a concrete fix or snippet.
