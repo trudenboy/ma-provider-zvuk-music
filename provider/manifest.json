@@ -4,7 +4,14 @@
   "stage": "stable",
   "name": "Zvuk Music",
   "description": "Stream music from Zvuk Music service.",
+<<<<<<< provider
   "codeowners": ["@TrudenBoy"],
+||||||| upstream-base
+  "codeowners": ["@trudenboy"],
+=======
+  "codeowners": ["@trudenboy"],
+  "media_types": ["artist", "album", "track", "playlist"],
+>>>>>>> upstream-head
   "documentation": "https://music-assistant.io/music-providers/zvuk/",
   "requirements": ["zvuk-music[async]==0.6.3"],
   "multi_instance": true
