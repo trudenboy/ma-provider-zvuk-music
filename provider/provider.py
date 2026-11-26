@@ -381,7 +381,59 @@ class ZvukMusicProvider(MusicProvider):
 
     # Library methods
 
+<<<<<<< provider
     async def get_library_artists(self) -> AsyncGenerator[Artist]:
+||||||| upstream-base
+    async def _iter_batched(
+        self,
+        ids: list[str],
+        fetcher: Any,
+        parser: Any,
+        item_type: str,
+    ) -> AsyncGenerator[Any, None]:
+        """Yield parsed items by fetching ``ids`` in batches of DEFAULT_LIMIT.
+
+        :param ids: List of item IDs to fetch.
+        :param fetcher: Async callable that accepts a list of IDs and returns a list of raw items.
+        :param parser: Callable(provider, raw_item) → MA media item.
+        :param item_type: Human-readable type name for debug log messages.
+        """
+        for i in range(0, len(ids), DEFAULT_LIMIT):
+            batch = ids[i : i + DEFAULT_LIMIT]
+            items = await fetcher(batch)
+            for item in items:
+                try:
+                    yield parser(self, item)
+                except InvalidDataError as err:
+                    self.logger.debug("Error parsing library %s: %s", item_type, err)
+
+    async def get_library_artists(self) -> AsyncGenerator[Artist, None]:
+=======
+    async def _iter_batched(
+        self,
+        ids: list[str],
+        fetcher: Any,
+        parser: Any,
+        item_type: str,
+    ) -> AsyncGenerator[Any]:
+        """Yield parsed items by fetching ``ids`` in batches of DEFAULT_LIMIT.
+
+        :param ids: List of item IDs to fetch.
+        :param fetcher: Async callable that accepts a list of IDs and returns a list of raw items.
+        :param parser: Callable(provider, raw_item) → MA media item.
+        :param item_type: Human-readable type name for debug log messages.
+        """
+        for i in range(0, len(ids), DEFAULT_LIMIT):
+            batch = ids[i : i + DEFAULT_LIMIT]
+            items = await fetcher(batch)
+            for item in items:
+                try:
+                    yield parser(self, item)
+                except InvalidDataError as err:
+                    self.logger.debug("Error parsing library %s: %s", item_type, err)
+
+    async def get_library_artists(self) -> AsyncGenerator[Artist]:
+>>>>>>> upstream-head
         """Retrieve library artists from Zvuk Music."""
         collection = await self.client.get_collection()
         if not collection or not collection.artists:
@@ -414,9 +466,17 @@ class ZvukMusicProvider(MusicProvider):
         ):
             yield track
 
+<<<<<<< provider
     async def get_library_playlists(self) -> AsyncGenerator[Playlist]:
         """
         Retrieve library playlists from Zvuk Music.
+||||||| upstream-base
+    async def get_library_playlists(self) -> AsyncGenerator[Playlist, None]:
+        """Retrieve library playlists from Zvuk Music.
+=======
+    async def get_library_playlists(self) -> AsyncGenerator[Playlist]:
+        """Retrieve library playlists from Zvuk Music.
+>>>>>>> upstream-head
 
         Yields user's own playlists followed by Zvuk's personalized synthesis
         playlists («Плейлисты для вас»: IDs 3, 4, 6, 11, 12, 13, 14, 15).
