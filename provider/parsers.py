@@ -56,6 +56,7 @@ def _get_image_url(image: ZvukImage | None, size: int = IMAGE_SIZE_LARGE) -> str
     if not image or not image.src:
         return None
     url = image.get_url(size, size)
+<<<<<<< provider
     if not url:
         return None
     # Ensure ?size=WxH is always set (get_url skips it when absent from the original URL)
@@ -68,6 +69,11 @@ def _get_image_url(image: ZvukImage | None, size: int = IMAGE_SIZE_LARGE) -> str
     if qs.get("subtype") == ["secondImage"]:
         qs["subtype"] = ["cover_background"]
     return urlunparse(parsed._replace(query=urlencode(qs, doseq=True)))
+||||||| upstream-base
+    return url if url else None
+=======
+    return url or None
+>>>>>>> upstream-head
 
 
 def parse_artist(provider: ZvukMusicProvider, artist_obj: ZvukArtist | ZvukSimpleArtist) -> Artist:
